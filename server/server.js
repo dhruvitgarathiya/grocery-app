@@ -46,20 +46,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Allow all origins - No CORS restrictions
-app.use(
-  cors({
-    origin: true, // Allow all origins
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: ["*"], // Allow all headers
-    exposedHeaders: ["Set-Cookie"],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  })
-);
+
+app.use(cors());
 
 // Handle preflight requests for all routes
-app.options("*", cors());
 
 // Add permissive headers for all requests
 app.use((req, res, next) => {
