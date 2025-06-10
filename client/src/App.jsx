@@ -6,6 +6,7 @@ import Products from "./pages/Products";
 import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import MyOrders from "./pages/MyOrders";
+import AddressManagement from "./pages/AddressManagement";
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer";
 import { useAppcontext } from "./context/AppContext";
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/addresses" element={<AddressManagement />} />
             <Route
               path="/seller"
               element={isSeller ? <SellerLayout /> : <SellerLogin />}

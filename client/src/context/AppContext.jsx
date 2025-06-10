@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
+import toast from "react-hot-toast";
 
 export const AppContext = createContext();
 
@@ -19,6 +20,9 @@ export const AppContextProvider = ({ children }) => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
+
+  // API base URL
+  const API_BASE_URL = "http://localhost:5000/api";
 
   // Fetch products function
   const fetchProducts = async () => {
@@ -39,6 +43,71 @@ export const AppContextProvider = ({ children }) => {
       console.error("Error fetching products:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch addresses from backend
+  const fetchAddresses = async () => {
+    if (!user) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/address/get`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ userId: user.id }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setAddresses(data.addresses || []);
+      } else {
+        console.error("Failed to fetch addresses:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    }
+  };
+
+  // Add address to backend
+  const addAddress = async (addressData) => {
+    if (!user) {
+      throw new Error("User not logged in");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/address/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        address: addressData,
+        userId: user.id,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      // Refresh addresses after adding
+      await fetchAddresses();
+      return data;
+    } else {
+      throw new Error(data.message || "Failed to add address");
+    }
+  };
+
+  // Remove address from backend
+  const removeAddress = async (addressId) => {
+    // For now, we'll just remove from local state
+    // You can implement backend deletion later
+    setAddresses((prev) => prev.filter((addr) => addr._id !== addressId));
+    if (selectedAddress?._id === addressId) {
+      setSelectedAddress(null);
     }
   };
 
@@ -119,18 +188,6 @@ export const AppContextProvider = ({ children }) => {
     }));
   };
 
-  // Add new functions for address management
-  const addAddress = (address) => {
-    setAddresses((prev) => [...prev, { ...address, id: Date.now() }]);
-  };
-
-  const removeAddress = (addressId) => {
-    setAddresses((prev) => prev.filter((addr) => addr.id !== addressId));
-    if (selectedAddress?.id === addressId) {
-      setSelectedAddress(null);
-    }
-  };
-
   const selectAddress = (address) => {
     setSelectedAddress(address);
   };
@@ -152,6 +209,13 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Fetch addresses when user changes
+  useEffect(() => {
+    if (user) {
+      fetchAddresses();
+    }
+  }, [user]);
 
   const contextValue = {
     user,
@@ -176,6 +240,7 @@ export const AppContextProvider = ({ children }) => {
     addresses,
     addAddress,
     removeAddress,
+    fetchAddresses,
     selectedAddress,
     selectAddress,
     paymentMethod,

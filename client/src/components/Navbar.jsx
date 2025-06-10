@@ -129,6 +129,12 @@ const Navbar = () => {
                 My orders
               </li>
               <li
+                onClick={() => navigate("/addresses")}
+                className="px-3 py-1.5 hover:bg-[#9B7A92]/10 cursor-pointer"
+              >
+                Addresses
+              </li>
+              <li
                 onClick={logout}
                 className="px-3 py-1.5 hover:bg-[#9B7A92]/10 cursor-pointer"
               >
@@ -159,6 +165,11 @@ const Navbar = () => {
             {user && (
               <NavLink to="/my-orders" onClick={() => setOpen(false)}>
                 My Orders
+              </NavLink>
+            )}
+            {user && (
+              <NavLink to="/addresses" onClick={() => setOpen(false)}>
+                Addresses
               </NavLink>
             )}
             <NavLink to="/contact" onClick={() => setOpen(false)}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useAppcontext } from "../context/AppContext";
 import { Link } from "react-router-dom";
 
@@ -10,24 +10,11 @@ const Cart = () => {
     addresses,
     selectedAddress,
     paymentMethod,
-    showAddressForm,
-    setShowAddressForm,
-    addAddress,
-    removeAddress,
     selectAddress,
     selectPaymentMethod,
     getCartAmount,
     products,
   } = useAppcontext();
-
-  const [newAddress, setNewAddress] = useState({
-    name: "",
-    street: "",
-    city: "",
-    state: "",
-    pincode: "",
-    phone: "",
-  });
 
   // Convert cartItems object to array
   const cartItemsArray = Object.values(cartItems).filter(
@@ -40,25 +27,6 @@ const Cart = () => {
       console.log("Cart items loaded:", cartItemsArray);
     }
   }, [products, cartItemsArray]);
-
-  const handleAddressSubmit = (e) => {
-    e.preventDefault();
-    addAddress(newAddress);
-    setNewAddress({
-      name: "",
-      street: "",
-      city: "",
-      state: "",
-      pincode: "",
-      phone: "",
-    });
-    setShowAddressForm(false);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewAddress((prev) => ({ ...prev, [name]: value }));
-  };
 
   return (
     <div className="mt-10 max-w-6xl mx-auto px-4">
@@ -151,136 +119,55 @@ const Cart = () => {
             <div className="bg-white p-6 rounded-lg shadow space-y-6">
               {/* Delivery Address Section */}
               <div>
-                <h3 className="text-lg font-medium mb-4">Delivery Address</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">Delivery Address</h3>
+                  <Link
+                    to="/addresses"
+                    className="text-[#9B7A92] hover:text-[#8A6A82] text-sm"
+                  >
+                    Manage Addresses
+                  </Link>
+                </div>
                 {addresses.length > 0 ? (
                   <div className="space-y-3">
                     {addresses.map((address) => (
                       <div
-                        key={address.id}
+                        key={address._id || address.id}
                         className={`p-3 border rounded-lg cursor-pointer ${
+                          selectedAddress?._id === address._id ||
                           selectedAddress?.id === address.id
                             ? "border-[#9B7A92] bg-[#9B7A92]/5"
                             : "border-gray-200"
                         }`}
                         onClick={() => selectAddress(address)}
                       >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-medium">{address.name}</p>
-                            <p className="text-sm text-gray-600">
-                              {address.street}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {address.city}, {address.state} -{" "}
-                              {address.pincode}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {address.phone}
-                            </p>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeAddress(address.id);
-                            }}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            Remove
-                          </button>
+                        <div>
+                          <p className="font-medium">
+                            {address.firstName} {address.lastName}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {address.street}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {address.city}, {address.state} - {address.zipcode}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {address.phone}
+                          </p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No addresses added</p>
-                )}
-
-                {!showAddressForm ? (
-                  <button
-                    onClick={() => setShowAddressForm(true)}
-                    className="mt-3 text-[#9B7A92] hover:text-[#8A6A82]"
-                  >
-                    + Add New Address
-                  </button>
-                ) : (
-                  <form
-                    onSubmit={handleAddressSubmit}
-                    className="mt-3 space-y-3"
-                  >
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Full Name"
-                      value={newAddress.name}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      required
-                    />
-                    <input
-                      type="text"
-                      name="street"
-                      placeholder="Street Address"
-                      value={newAddress.street}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded"
-                      required
-                    />
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        name="city"
-                        placeholder="City"
-                        value={newAddress.city}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded"
-                        required
-                      />
-                      <input
-                        type="text"
-                        name="state"
-                        placeholder="State"
-                        value={newAddress.state}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded"
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        name="pincode"
-                        placeholder="Pincode"
-                        value={newAddress.pincode}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded"
-                        required
-                      />
-                      <input
-                        type="tel"
-                        name="phone"
-                        placeholder="Phone"
-                        value={newAddress.phone}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded"
-                        required
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="submit"
-                        className="flex-1 bg-[#9B7A92] text-white py-2 rounded hover:bg-[#8A6A82]"
-                      >
-                        Save Address
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowAddressForm(false)}
-                        className="flex-1 bg-gray-100 text-gray-600 py-2 rounded hover:bg-gray-200"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
+                  <div className="text-center py-4">
+                    <p className="text-gray-500 mb-3">No addresses added</p>
+                    <Link
+                      to="/addresses"
+                      className="inline-block bg-[#9B7A92] text-white px-4 py-2 rounded-md hover:bg-[#8A6A82] transition text-sm"
+                    >
+                      Add Address
+                    </Link>
+                  </div>
                 )}
               </div>
 

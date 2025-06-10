@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAppcontext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const { setShowUserLogin, setUser } = useAppcontext();
@@ -11,6 +12,9 @@ const Login = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const API_BASE_URL = "http://localhost:5000/api";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,36 +25,89 @@ const Login = () => {
     setError(""); // Clear error when user types
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    if (state === "register") {
-      // Validate registration
-      if (formData.password !== formData.confirmPassword) {
-        setError("Passwords do not match!");
-        return;
+    try {
+      if (state === "register") {
+        // Validate registration
+        if (formData.password !== formData.confirmPassword) {
+          setError("Passwords do not match!");
+          return;
+        }
+        if (formData.password.length < 6) {
+          setError("Password must be at least 6 characters long!");
+          return;
+        }
+
+        // Register API call
+        const response = await fetch(`${API_BASE_URL}/user/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setUser({
+            id: data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+          });
+          setShowUserLogin(false);
+          toast.success("Registration successful!");
+        } else {
+          setError(data.message || "Registration failed!");
+        }
+      } else {
+        // Handle login
+        if (!formData.email || !formData.password) {
+          setError("Please fill in all fields!");
+          return;
+        }
+
+        // Login API call
+        const response = await fetch(`${API_BASE_URL}/user/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setUser({
+            id: data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+          });
+          setShowUserLogin(false);
+          toast.success("Login successful!");
+        } else {
+          setError(data.message || "Login failed!");
+        }
       }
-      if (formData.password.length < 6) {
-        setError("Password must be at least 6 characters long!");
-        return;
-      }
-      // Here you would typically make an API call to register
-      console.log("Register:", formData);
-      // For now, just simulate successful registration
-      setUser({ name: formData.name, email: formData.email });
-      setShowUserLogin(false);
-    } else {
-      // Handle login
-      if (!formData.email || !formData.password) {
-        setError("Please fill in all fields!");
-        return;
-      }
-      // Here you would typically make an API call to login
-      console.log("Login:", formData);
-      // For now, just simulate successful login
-      setUser({ email: formData.email });
-      setShowUserLogin(false);
+    } catch (error) {
+      console.error("Auth error:", error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -185,9 +242,14 @@ const Login = () => {
 
         <button
           type="submit"
-          className="w-full py-3 text-white bg-[#9B7A92] rounded-md hover:bg-[#7C5A6B] transition duration-300"
+          disabled={loading}
+          className="w-full py-3 text-white bg-[#9B7A92] rounded-md hover:bg-[#7C5A6B] transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {state === "register" ? "Create Account" : "Sign In"}
+          {loading
+            ? "Loading..."
+            : state === "register"
+            ? "Create Account"
+            : "Sign In"}
         </button>
 
         <p className="text-center text-sm text-gray-600">
@@ -201,7 +263,7 @@ const Login = () => {
             }
             className="text-[#9B7A92] hover:text-[#7C5A6B] font-medium"
           >
-            {state === "register" ? "Sign in" : "Sign up"}
+            {state === "register" ? "Sign In" : "Sign Up"}
           </button>
         </p>
       </form>
