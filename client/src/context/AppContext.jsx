@@ -10,13 +10,14 @@ import { dummyProducts } from "../assets/assets";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-// Configure axios with environment variable
-axios.defaults.withCredentials = true;
-
 // Set base URL for axios - use environment variable or fallback to deployed URL
 const backendURL =
   import.meta.env.VITE_BACKEND_URL || "https://grocery-app-abnm.onrender.com";
 axios.defaults.baseURL = backendURL + "/api";
+
+// Configure axios for CORS
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common["Content-Type"] = "application/json";
 
 console.log("Backend URL:", backendURL);
 

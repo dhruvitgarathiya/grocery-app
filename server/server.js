@@ -45,38 +45,36 @@ await connectCloudinary();
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS configuration for deployment
-const allowedOrigins = [
-  process.env.CLIENT_URL || "http://localhost:5173",
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://grocery-app-1-w432.onrender.com", // Add your deployed frontend URL
-  "https://grocery-app-abnm.onrender.com", // Add your backend URL as well
-];
-
+// Allow all origins - No CORS restrictions
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-
-      // Allow all render.com subdomains for flexibility
-      if (origin && origin.includes("onrender.com")) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.log("CORS blocked origin:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: true, // Allow all origins
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["*"], // Allow all headers
+    exposedHeaders: ["Set-Cookie"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   })
 );
+
+// Handle preflight requests for all routes
+app.options("*", cors());
+
+// Add permissive headers for all requests
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,PUT,POST,DELETE,OPTIONS,PATCH"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin,X-Requested-With,Content-Type,Accept,Authorization"
+  );
+  next();
+});
 
 // Basic route
 app.get("/", (req, res) => {
