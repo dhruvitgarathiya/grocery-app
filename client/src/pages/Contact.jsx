@@ -17,7 +17,7 @@ const Contact = () => {
               type="text"
               id="name"
               name="name"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#9B7A92] focus:ring-[#9B7A92]"
+              className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-[#00FF41] focus:ring-[#00FF41] bg-gray-800 text-white"
             />
           </div>
           <div>
@@ -31,7 +31,7 @@ const Contact = () => {
               type="email"
               id="email"
               name="email"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#9B7A92] focus:ring-[#9B7A92]"
+              className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-[#00FF41] focus:ring-[#00FF41] bg-gray-800 text-white"
             />
           </div>
           <div>
@@ -45,12 +45,12 @@ const Contact = () => {
               id="message"
               name="message"
               rows={4}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#9B7A92] focus:ring-[#9B7A92]"
+              className="mt-1 block w-full rounded-md border-gray-600 shadow-sm focus:border-[#00FF41] focus:ring-[#00FF41] bg-gray-800 text-white"
             />
           </div>
           <button
             type="submit"
-            className="bg-[#9B7A92] text-white px-4 py-2 rounded-md hover:bg-[#8A6A82] transition"
+            className="bg-[#00FF41] text-black px-4 py-2 rounded-md hover:bg-[#00CC33] transition"
           >
             Send Message
           </button>

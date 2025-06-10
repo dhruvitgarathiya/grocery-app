@@ -1,7 +1,18 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
+import axios from "axios";
 import toast from "react-hot-toast";
+
+// Configure axios with environment variable
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL + "/api";
 
 export const AppContext = createContext();
 
@@ -10,6 +21,7 @@ export const AppContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isSeller, setIsSeller] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
+  const [showSellerLogin, setShowSellerLogin] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,30 +33,447 @@ export const AppContextProvider = ({ children }) => {
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
 
-  // API base URL
-  const API_BASE_URL = "http://localhost:5000/api";
+  // Order management states
+  const [userOrders, setUserOrders] = useState([]);
+  const [sellerOrders, setSellerOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [orderError, setOrderError] = useState(null);
+  const [orderStats, setOrderStats] = useState({
+    total: 0,
+    pending: 0,
+    processing: 0,
+    delivered: 0,
+    cancelled: 0,
+  });
 
-  // Fetch products function
-  const fetchProducts = async () => {
+  // API base URL from environment variable
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + "/api";
+
+  // Check seller authentication on mount
+  const checkSellerAuth = useCallback(async () => {
+    try {
+      const response = await axios.get("/seller/is-auth");
+      if (response.data.success) {
+        setIsSeller(true);
+        // Fetch seller orders if authenticated
+        fetchSellerOrders();
+      }
+    } catch (error) {
+      // Seller is not authenticated, which is fine
+      setIsSeller(false);
+    }
+  }, []);
+
+  // Check user authentication on mount
+  const checkUserAuth = useCallback(async () => {
+    try {
+      const response = await axios.get("/user/is-auth");
+      if (response.data.success) {
+        setUser({
+          id: response.data.user._id,
+          name: response.data.user.name,
+          email: response.data.user.email,
+        });
+        // Don't call fetchUserOrders here to avoid circular dependency
+        // Let the MyOrders component handle it when user is available
+      }
+    } catch (error) {
+      // User is not authenticated, which is fine
+      setUser(null);
+    }
+  }, []);
+
+  // User logout function
+  const userLogout = useCallback(async () => {
+    try {
+      await axios.get("/user/logout");
+      setUser(null);
+      setCartItems({});
+      setAddresses([]);
+      setSelectedAddress(null);
+      setPaymentMethod(null);
+      setUserOrders([]);
+      navigate("/");
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Logout error:", error);
+      setUser(null);
+      setCartItems({});
+      setAddresses([]);
+      setSelectedAddress(null);
+      setPaymentMethod(null);
+      setUserOrders([]);
+      navigate("/");
+    }
+  }, [navigate]);
+
+  // Seller logout function
+  const sellerLogout = useCallback(async () => {
+    try {
+      await axios.get("/seller/logout");
+      setIsSeller(false);
+      setSellerOrders([]);
+      navigate("/");
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Logout error:", error);
+      setIsSeller(false);
+      setSellerOrders([]);
+      navigate("/");
+    }
+  }, [navigate]);
+
+  // Fetch user orders
+  const fetchUserOrders = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      setOrdersLoading(true);
+      setOrderError(null);
+
+      const response = await axios.get("/order/user");
+
+      if (response.data.success) {
+        setUserOrders(response.data.orders || []);
+        toast.success("Orders fetched successfully");
+      } else {
+        setOrderError(response.data.message || "Failed to fetch orders");
+        toast.error("Failed to fetch orders");
+      }
+    } catch (error) {
+      console.error("Error fetching user orders:", error);
+      setOrderError("Failed to fetch orders");
+      toast.error("Failed to fetch orders");
+    } finally {
+      setOrdersLoading(false);
+    }
+  }, [user]);
+
+  // Fetch seller orders
+  const fetchSellerOrders = useCallback(async () => {
+    if (!isSeller) return;
+
+    try {
+      setOrdersLoading(true);
+      setOrderError(null);
+
+      const response = await axios.get("/order/seller");
+
+      if (response.data.success) {
+        const orders = response.data.orders || [];
+        setSellerOrders(orders);
+
+        // Calculate order statistics
+        const stats = {
+          total: orders.length,
+          pending: orders.filter((order) => order.status === "order placed")
+            .length,
+          processing: orders.filter((order) => order.status === "processing")
+            .length,
+          delivered: orders.filter((order) => order.status === "delivered")
+            .length,
+          cancelled: orders.filter((order) => order.status === "cancelled")
+            .length,
+        };
+        setOrderStats(stats);
+
+        toast.success("Orders fetched successfully");
+      } else {
+        setOrderError(response.data.message || "Failed to fetch orders");
+        toast.error("Failed to fetch orders");
+      }
+    } catch (error) {
+      console.error("Error fetching seller orders:", error);
+      setOrderError("Failed to fetch orders");
+      toast.error("Failed to fetch orders");
+    } finally {
+      setOrdersLoading(false);
+    }
+  }, [isSeller]);
+
+  // Place order (for users)
+  const placeOrder = useCallback(
+    async (orderData) => {
+      if (!user) {
+        toast.error("Please login to place an order");
+        return null;
+      }
+
+      if (!selectedAddress) {
+        toast.error("Please select a delivery address");
+        return null;
+      }
+
+      if (!paymentMethod) {
+        toast.error("Please select a payment method");
+        return null;
+      }
+
+      try {
+        setOrdersLoading(true);
+        setOrderError(null);
+
+        const orderPayload = {
+          items: Object.values(cartItems).map((item) => ({
+            product: item._id,
+            quantity: item.quantity,
+          })),
+          address: selectedAddress._id,
+          paymentType: "COD", // Only COD payment
+        };
+
+        const response = await axios.post("/order/cod", orderPayload);
+
+        if (response.data.success) {
+          toast.success("Order placed successfully!");
+
+          // Clear cart and reset form
+          setCartItems({});
+          setSelectedAddress(null);
+          setPaymentMethod(null);
+
+          // Refresh user orders
+          await fetchUserOrders();
+
+          // Navigate to orders page
+          navigate("/my-orders");
+
+          return response.data;
+        } else {
+          setOrderError(response.data.message || "Failed to place order");
+          toast.error(response.data.message || "Failed to place order");
+          return null;
+        }
+      } catch (error) {
+        console.error("Error placing order:", error);
+        setOrderError("Failed to place order");
+        toast.error("Failed to place order");
+        return null;
+      } finally {
+        setOrdersLoading(false);
+      }
+    },
+    [user, selectedAddress, paymentMethod, cartItems, navigate, fetchUserOrders]
+  );
+
+  // Update order status (for sellers)
+  const updateOrderStatus = useCallback(
+    async (orderId, newStatus) => {
+      if (!isSeller) {
+        toast.error("Only sellers can update order status");
+        return false;
+      }
+
+      try {
+        setOrdersLoading(true);
+        setOrderError(null);
+
+        const response = await axios.put("/order/status", {
+          orderId,
+          status: newStatus,
+        });
+
+        if (response.data.success) {
+          toast.success(`Order status updated to ${newStatus}`);
+
+          // Update local state
+          setSellerOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order._id === orderId ? { ...order, status: newStatus } : order
+            )
+          );
+
+          // Update user orders if user is viewing their orders
+          setUserOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order._id === orderId ? { ...order, status: newStatus } : order
+            )
+          );
+
+          // Refresh order statistics
+          await fetchSellerOrders();
+
+          return true;
+        } else {
+          setOrderError(
+            response.data.message || "Failed to update order status"
+          );
+          toast.error(response.data.message || "Failed to update order status");
+          return false;
+        }
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        setOrderError("Failed to update order status");
+        toast.error("Failed to update order status");
+        return false;
+      } finally {
+        setOrdersLoading(false);
+      }
+    },
+    [isSeller, fetchSellerOrders]
+  );
+
+  // Cancel order (for users)
+  const cancelOrder = useCallback(
+    async (orderId) => {
+      if (!user) {
+        toast.error("Please login to cancel orders");
+        return false;
+      }
+
+      try {
+        setOrdersLoading(true);
+        setOrderError(null);
+
+        const response = await axios.put("/order/cancel", {
+          orderId,
+        });
+
+        if (response.data.success) {
+          toast.success("Order cancelled successfully");
+
+          // Update local state
+          setUserOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order._id === orderId ? { ...order, status: "cancelled" } : order
+            )
+          );
+
+          // Refresh orders
+          await fetchUserOrders();
+
+          return true;
+        } else {
+          setOrderError(response.data.message || "Failed to cancel order");
+          toast.error(response.data.message || "Failed to cancel order");
+          return false;
+        }
+      } catch (error) {
+        console.error("Error cancelling order:", error);
+        setOrderError("Failed to cancel order");
+        toast.error("Failed to cancel order");
+        return false;
+      } finally {
+        setOrdersLoading(false);
+      }
+    },
+    [user, fetchUserOrders]
+  );
+
+  // Get order by ID
+  const getOrderById = useCallback(
+    (orderId) => {
+      const allOrders = [...userOrders, ...sellerOrders];
+      return allOrders.find((order) => order._id === orderId);
+    },
+    [userOrders, sellerOrders]
+  );
+
+  // Get orders by status
+  const getOrdersByStatus = useCallback(
+    (status) => {
+      if (isSeller) {
+        return sellerOrders.filter((order) => order.status === status);
+      } else {
+        return userOrders.filter((order) => order.status === status);
+      }
+    },
+    [isSeller, sellerOrders, userOrders]
+  );
+
+  // Get recent orders
+  const getRecentOrders = useCallback(
+    (limit = 5) => {
+      const orders = isSeller ? sellerOrders : userOrders;
+      return orders
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, limit);
+    },
+    [isSeller, sellerOrders, userOrders]
+  );
+
+  // Fetch products function - memoized to prevent infinite re-renders
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      // Simulating API call with setTimeout
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Initialize products with inStock property
-      const productsWithStock = dummyProducts.map((product) => ({
-        ...product,
-        inStock: true, // Set default inStock value
-      }));
-      setProducts(productsWithStock);
-      setFilteredProducts(productsWithStock);
+
+      console.log("Fetching products from backend...");
+      const response = await axios.get("/product/list");
+
+      if (response.data.success) {
+        const backendProducts = response.data.products || [];
+
+        // For seller dashboard, use only backend products
+        // For customer view, combine with dummy products
+        const productsWithStock = backendProducts.map((product) => ({
+          ...product,
+          inStock: product.inStock !== undefined ? product.inStock : true,
+        }));
+
+        setProducts(productsWithStock);
+        setFilteredProducts(productsWithStock);
+
+        console.log("Products fetched successfully:", productsWithStock.length);
+      } else {
+        console.error("Failed to fetch products:", response.data.message);
+        setError(response.data.message || "Failed to fetch products");
+        // Set empty array instead of dummy products for seller dashboard
+        setProducts([]);
+        setFilteredProducts([]);
+      }
     } catch (err) {
-      setError(err.message || "Failed to fetch products");
       console.error("Error fetching products:", err);
+      setError(err.message || "Failed to fetch products");
+      // Set empty array instead of dummy products for seller dashboard
+      setProducts([]);
+      setFilteredProducts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Fetch products for customer view (with dummy products fallback)
+  const fetchCustomerProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch products from backend
+      const response = await axios.get("/product/list");
+
+      if (response.data.success) {
+        const backendProducts = response.data.products || [];
+        // Combine backend products with dummy products for customer view
+        const allProducts = [...dummyProducts, ...backendProducts];
+        const productsWithStock = allProducts.map((product) => ({
+          ...product,
+          inStock: product.inStock !== undefined ? product.inStock : true,
+        }));
+        setProducts(productsWithStock);
+        setFilteredProducts(productsWithStock);
+      } else {
+        // Fallback to dummy products if backend fails for customer view
+        const productsWithStock = dummyProducts.map((product) => ({
+          ...product,
+          inStock: true,
+        }));
+        setProducts(productsWithStock);
+        setFilteredProducts(productsWithStock);
+      }
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      // Fallback to dummy products for customer view
+      const productsWithStock = dummyProducts.map((product) => ({
+        ...product,
+        inStock: true,
+      }));
+      setProducts(productsWithStock);
+      setFilteredProducts(productsWithStock);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Fetch addresses from backend
   const fetchAddresses = async () => {
@@ -111,19 +540,33 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  // Update product stock status
-  const updateProductStock = (productId, inStock) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product._id === productId ? { ...product, inStock } : product
-      )
-    );
-    // Also update filtered products to keep them in sync
-    setFilteredProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product._id === productId ? { ...product, inStock } : product
-      )
-    );
+  // Update product stock
+  const updateProductStock = async (productId, inStock) => {
+    try {
+      const response = await axios.post("/product/stock", {
+        id: productId,
+        inStock: inStock,
+      });
+
+      if (response.data.success) {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product._id === productId ? { ...product, inStock } : product
+          )
+        );
+        setFilteredProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product._id === productId ? { ...product, inStock } : product
+          )
+        );
+        toast.success("Stock updated successfully");
+      } else {
+        toast.error("Failed to update stock");
+      }
+    } catch (error) {
+      console.error("Error updating stock:", error);
+      toast.error("Failed to update stock");
+    }
   };
 
   // Search products function
@@ -208,7 +651,9 @@ export const AppContextProvider = ({ children }) => {
   // Fetch products on mount
   useEffect(() => {
     fetchProducts();
-  }, []);
+    checkSellerAuth(); // Check seller authentication on mount
+    checkUserAuth(); // Check user authentication on mount
+  }, [fetchProducts, checkSellerAuth, checkUserAuth]);
 
   // Fetch addresses when user changes
   useEffect(() => {
@@ -224,6 +669,8 @@ export const AppContextProvider = ({ children }) => {
     setIsSeller,
     showUserLogin,
     setShowUserLogin,
+    showSellerLogin,
+    setShowSellerLogin,
     products,
     setProducts,
     loading,
@@ -249,7 +696,31 @@ export const AppContextProvider = ({ children }) => {
     setShowAddressForm,
     getCartAmount,
     updateProductStock,
+    fetchProducts,
+    fetchCustomerProducts,
     navigate,
+    axios,
+    sellerLogout,
+    checkSellerAuth,
+    userLogout,
+    userOrders,
+    setUserOrders,
+    sellerOrders,
+    setSellerOrders,
+    ordersLoading,
+    setOrdersLoading,
+    orderError,
+    setOrderError,
+    orderStats,
+    setOrderStats,
+    fetchUserOrders,
+    fetchSellerOrders,
+    placeOrder,
+    updateOrderStatus,
+    cancelOrder,
+    getOrderById,
+    getOrdersByStatus,
+    getRecentOrders,
   };
 
   return (

@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 cursor-pointer"
+      className="bg-gray-900 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 cursor-pointer border border-gray-700"
     >
       {/* Product Image */}
       <div className="relative h-48 overflow-hidden group">
@@ -49,10 +49,10 @@ const ProductCard = ({ product }) => {
 
       {/* Product Info */}
       <div className="p-4">
-        <h3 className="text-lg font-medium text-gray-800 mb-1 line-clamp-1">
+        <h3 className="text-lg font-medium text-white mb-1 line-clamp-1">
           {product.name || "Product Name"}
         </h3>
-        <p className="text-sm text-gray-500 mb-2 line-clamp-2">
+        <p className="text-sm text-gray-300 mb-2 line-clamp-2">
           {Array.isArray(product.description)
             ? product.description.join(", ")
             : product.description || "No description available"}
@@ -60,11 +60,11 @@ const ProductCard = ({ product }) => {
 
         {/* Price Section */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-[#9B7A92] font-semibold text-lg">
+          <span className="text-[#00FF41] font-semibold text-lg">
             ₹{product.offerPrice || product.price || 0}
           </span>
           {product.price > product.offerPrice && (
-            <span className="text-gray-500 line-through text-sm">
+            <span className="text-gray-400 line-through text-sm">
               ₹{product.price}
             </span>
           )}
@@ -73,7 +73,7 @@ const ProductCard = ({ product }) => {
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          className="w-full bg-[#9B7A92]/10 text-[#9B7A92] hover:bg-[#9B7A92]/20 px-4 py-2 rounded-full text-sm font-medium transition-colors"
+          className="w-full bg-[#00FF41]/10 text-[#00FF41] hover:bg-[#00FF41]/20 px-4 py-2 rounded-full text-sm font-medium transition-colors"
         >
           Add to Cart
         </button>

@@ -54,16 +54,16 @@ export const sellerLogin = async (req, res) => {
 //seller auth
 export const isSellerAuth = async (req, res) => {
   try {
-    const { token } = req.cookies;
+    const { sellerToken } = req.cookies;
 
-    if (!token) {
+    if (!sellerToken) {
       return res.status(401).json({
         success: false,
         message: "Not authorized - No token provided",
       });
     }
 
-    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
+    const tokenDecode = jwt.verify(sellerToken, process.env.JWT_SECRET);
 
     if (tokenDecode.email === process.env.SELLER_EMAIL) {
       return res.json({

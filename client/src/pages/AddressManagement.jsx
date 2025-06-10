@@ -20,6 +20,8 @@ const AddressManagement = () => {
     phone: "",
   });
 
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + "/api";
+
   useEffect(() => {
     if (user) {
       fetchAddresses();
@@ -81,7 +83,7 @@ const AddressManagement = () => {
           </p>
           <Link
             to="/"
-            className="inline-block bg-[#9B7A92] text-white px-6 py-2 rounded-md hover:bg-[#8A6A82] transition"
+            className="inline-block bg-[#00FF41] text-black px-6 py-2 rounded-md hover:bg-[#00CC33] transition"
           >
             Go to Home
           </Link>
@@ -96,7 +98,7 @@ const AddressManagement = () => {
         <h1 className="text-2xl md:text-3xl font-medium">Address Management</h1>
         <Link
           to="/cart"
-          className="text-[#9B7A92] hover:text-[#8A6A82] transition"
+          className="text-[#00FF41] hover:text-[#00CC33] transition"
         >
           ← Back to Cart
         </Link>
@@ -107,10 +109,10 @@ const AddressManagement = () => {
         <h2 className="text-xl font-medium mb-4">Your Addresses</h2>
         {addresses.length === 0 ? (
           <div className="text-center py-8 bg-gray-50 rounded-lg">
-            <p className="text-gray-500 mb-4">No addresses added yet</p>
+            <p className="text-gray-300 mb-4">No addresses added yet</p>
             <button
               onClick={() => setShowForm(true)}
-              className="bg-[#9B7A92] text-white px-6 py-2 rounded-md hover:bg-[#8A6A82] transition"
+              className="bg-[#00FF41] text-black px-6 py-2 rounded-md hover:bg-[#00CC33] transition"
             >
               Add Your First Address
             </button>
@@ -155,7 +157,7 @@ const AddressManagement = () => {
         <div className="text-center">
           <button
             onClick={() => setShowForm(true)}
-            className="bg-[#9B7A92] text-white px-6 py-3 rounded-md hover:bg-[#8A6A82] transition font-medium"
+            className="bg-[#00FF41] text-black px-6 py-3 rounded-md hover:bg-[#00CC33] transition font-medium"
           >
             + Add New Address
           </button>
@@ -174,7 +176,7 @@ const AddressManagement = () => {
                   name="firstName"
                   value={newAddress.firstName}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                   required
                 />
               </div>
@@ -187,7 +189,7 @@ const AddressManagement = () => {
                   name="lastName"
                   value={newAddress.lastName}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                   required
                 />
               </div>
@@ -202,7 +204,7 @@ const AddressManagement = () => {
                 name="email"
                 value={newAddress.email}
                 onChange={handleInputChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                 required
               />
             </div>
@@ -216,7 +218,7 @@ const AddressManagement = () => {
                 name="street"
                 value={newAddress.street}
                 onChange={handleInputChange}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                 required
               />
             </div>
@@ -231,7 +233,7 @@ const AddressManagement = () => {
                   name="city"
                   value={newAddress.city}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                   required
                 />
               </div>
@@ -244,7 +246,7 @@ const AddressManagement = () => {
                   name="state"
                   value={newAddress.state}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                   required
                 />
               </div>
@@ -257,7 +259,7 @@ const AddressManagement = () => {
                   name="zipcode"
                   value={newAddress.zipcode}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                   required
                 />
               </div>
@@ -273,7 +275,7 @@ const AddressManagement = () => {
                   name="country"
                   value={newAddress.country}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                   required
                 />
               </div>
@@ -286,7 +288,7 @@ const AddressManagement = () => {
                   name="phone"
                   value={newAddress.phone}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#9B7A92] focus:border-transparent"
+                  className="w-full p-3 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00FF41] focus:border-transparent bg-gray-800 text-white"
                   required
                 />
               </div>
@@ -296,7 +298,7 @@ const AddressManagement = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-[#9B7A92] text-white py-3 rounded-md hover:bg-[#8A6A82] transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-[#00FF41] text-black py-3 rounded-md hover:bg-[#00CC33] transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Adding..." : "Save Address"}
               </button>

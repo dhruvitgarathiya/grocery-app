@@ -19,13 +19,13 @@ const NewsLatter = () => {
   };
 
   return (
-    <div className="bg-white py-16">
+    <div className="bg-gray-900 py-16 border-t border-gray-700">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4">
             Subscribe to Our Newsletter
           </h2>
-          <p className="text-gray-600 mb-8">
+          <p className="text-gray-300 mb-8">
             Stay updated with our latest products, offers, and gardening tips!
           </p>
 
@@ -39,31 +39,31 @@ const NewsLatter = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className={`w-full px-4 py-3 rounded-full border ${
-                  status === "error" ? "border-red-500" : "border-[#9B7A92]"
-                } focus:outline-none focus:ring-2 focus:ring-[#9B7A92]/20`}
+                className={`w-full px-4 py-3 rounded-full border bg-gray-800 text-white ${
+                  status === "error" ? "border-red-500" : "border-[#00FF41]"
+                } focus:outline-none focus:ring-2 focus:ring-[#00FF41]/20`}
               />
               {status === "error" && (
-                <p className="text-red-500 text-sm mt-1 text-left">
+                <p className="text-red-400 text-sm mt-1 text-left">
                   Please enter a valid email address
                 </p>
               )}
             </div>
             <button
               type="submit"
-              className="px-8 py-3 bg-[#9B7A92] text-white rounded-full hover:bg-[#7C5A6B] transition duration-300 whitespace-nowrap"
+              className="px-8 py-3 bg-[#00FF41] text-black rounded-full hover:bg-[#00CC33] transition duration-300 whitespace-nowrap font-semibold"
             >
               Subscribe
             </button>
           </form>
 
           {status === "success" && (
-            <p className="text-green-600 mt-4">
+            <p className="text-[#00FF41] mt-4">
               Thank you for subscribing to our newsletter!
             </p>
           )}
 
-          <p className="text-sm text-gray-500 mt-6">
+          <p className="text-sm text-gray-400 mt-6">
             By subscribing, you agree to our Privacy Policy and consent to
             receive updates from our company.
           </p>

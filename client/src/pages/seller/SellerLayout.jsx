@@ -3,7 +3,7 @@ import { useAppcontext } from "../../context/AppContext";
 import { Link, NavLink, Outlet } from "react-router-dom";
 
 const SellerLayout = () => {
-  const { setIsSeller } = useAppcontext();
+  const { sellerLogout } = useAppcontext();
 
   const sidebarLinks = [
     { name: "Add Product", path: "/seller", icon: assets.add_icon },
@@ -15,14 +15,18 @@ const SellerLayout = () => {
     { name: "Orders", path: "/seller/orders", icon: assets.order_icon },
   ];
 
-  const logout = async () => {
-    setIsSeller(false);
+  const handleLogout = async () => {
+    try {
+      await sellerLogout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-8 border-b border-gray-200 py-3 bg-white shadow-sm">
+      <div className="flex items-center justify-between px-4 md:px-8 border-b border-gray-700 py-3 bg-gray-900 shadow-sm">
         <Link to="/">
           <img
             src={assets.logo}
@@ -30,11 +34,11 @@ const SellerLayout = () => {
             className="cursor-pointer w-34 md:w-38"
           />
         </Link>
-        <div className="flex items-center gap-5 text-gray-500">
+        <div className="flex items-center gap-5 text-gray-300">
           <p>Hi! Admin</p>
           <button
-            onClick={logout}
-            className="border rounded-full text-sm px-4 py-1 hover:bg-gray-50 transition-colors"
+            onClick={handleLogout}
+            className="border border-gray-600 rounded-full text-sm px-4 py-1 hover:bg-gray-800 transition-colors text-white"
           >
             Logout
           </button>
@@ -44,7 +48,7 @@ const SellerLayout = () => {
       {/* Main Content */}
       <div className="flex h-[calc(100vh-64px)]">
         {/* Sidebar */}
-        <div className="w-64 bg-white border-r border-gray-200 shadow-sm">
+        <div className="w-64 bg-gray-900 border-r border-gray-700 shadow-sm">
           <nav className="p-4 space-y-1">
             {sidebarLinks.map((item) => (
               <NavLink
@@ -54,8 +58,8 @@ const SellerLayout = () => {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     isActive
-                      ? "bg-[#9B7A92]/10 text-[#9B7A92] font-medium"
-                      : "text-gray-600 hover:bg-gray-50"
+                      ? "bg-[#00FF41]/10 text-[#00FF41] font-medium"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   }`
                 }
               >
@@ -67,7 +71,7 @@ const SellerLayout = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto bg-black">
           <Outlet />
         </div>
       </div>

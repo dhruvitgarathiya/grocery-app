@@ -1,6 +1,12 @@
 // Load environment variables with explicit path
 import dotenv from "dotenv";
-dotenv.config();
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: join(__dirname, ".env") });
 
 import cookieParser from "cookie-parser";
 import express from "express";
@@ -22,6 +28,7 @@ console.log("Environment variables loaded:");
 console.log("PORT:", process.env.PORT);
 console.log("MONGODB_URI:", process.env.MONGODB_URI ? "Set" : "Not set");
 console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Set" : "Not set");
+console.log("CLIENT_URL:", process.env.CLIENT_URL || "http://localhost:5173");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -37,10 +44,29 @@ await connectCloudinary();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+
+// CORS configuration for deployment
+const allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -65,4 +91,5 @@ app.use((err, req, res, next) => {
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
 });

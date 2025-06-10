@@ -7,10 +7,29 @@
 }
 
 @theme {
-  --color-primary: #9b7a92;
-  --color-primary-dull: #9b7a92;
+  --color-primary: #00ff41;
+  --color-primary-dull: #00cc33;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+body {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00cc33;
 }

@@ -8,22 +8,23 @@ const MainBanner = () => {
       <img
         src={assets.main_banner_bg}
         alt="banner"
-        className="w-full hidden md:block"
+        className="w-full hidden md:block brightness-50"
       />
       <img
         src={assets.main_banner_bg_sm}
         alt="banner"
-        className="w-full md:hidden"
+        className="w-full md:hidden brightness-50"
       />
+      <div className="absolute inset-0 bg-black/30"></div>
       <div className="absolute inset-0 flex flex-col items-center md:items-start justify-end md:justify-center pb-24 md:pb-0 px-4 md:pl-18 lg:pl-24">
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center md:text-left max-2-72 md:max-w-80 lg:max-w-105 leading-tight lg:leading-15">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center md:text-left max-2-72 md:max-w-80 lg:max-w-105 leading-tight lg:leading-15 text-white">
           Freshness you can trust ,saving you will love
         </h1>
 
         <div className="flex items-center mt-6 font-medium">
           <NavLink
             to="/products"
-            className="group flex items-center gap-2 md:px-9 py-3 bg-primary hover:bg-green transition rounded text-white cursor-pointer"
+            className="group flex items-center gap-2 md:px-9 py-3 bg-[#00FF41] hover:bg-[#00CC33] transition rounded text-black cursor-pointer font-semibold"
           >
             shop now
             <img
@@ -35,7 +36,7 @@ const MainBanner = () => {
 
           <NavLink
             to="/products"
-            className="group hidden md:flex items-center gap-2 px-9 py-2 cursor-pointer"
+            className="group hidden md:flex items-center gap-2 px-9 py-2 cursor-pointer text-[#00FF41] hover:text-[#00CC33] transition"
           >
             explor deals
             <img

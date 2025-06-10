@@ -56,8 +56,8 @@ const ProductDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#9B7A92]"></div>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00FF41]"></div>
       </div>
     );
   }
@@ -80,7 +80,7 @@ const ProductDetails = () => {
           <p className="text-xl font-medium text-gray-800 mb-2">
             Product not found
           </p>
-          <Link to="/products" className="text-[#9B7A92] hover:underline">
+          <Link to="/products" className="text-[#00FF41] hover:underline">
             Return to products
           </Link>
         </div>
@@ -92,22 +92,22 @@ const ProductDetails = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-        <Link to="/" className="hover:text-[#9B7A92]">
+        <Link to="/" className="hover:text-[#00FF41]">
           Home
         </Link>
         <span>/</span>
-        <Link to="/products" className="hover:text-[#9B7A92]">
+        <Link to="/products" className="hover:text-[#00FF41]">
           Products
         </Link>
         <span>/</span>
         <Link
           to={`/products/${product.category.toLowerCase()}`}
-          className="hover:text-[#9B7A92]"
+          className="hover:text-[#00FF41]"
         >
           {product.category}
         </Link>
         <span>/</span>
-        <span className="text-[#9B7A92]">{product.name}</span>
+        <span className="text-[#00FF41]">{product.name}</span>
       </nav>
 
       {/* Product Details */}
@@ -121,7 +121,7 @@ const ProductDetails = () => {
                 key={index}
                 onClick={() => setThumbnail(image)}
                 className={`w-20 h-20 border rounded-lg overflow-hidden ${
-                  thumbnail === image ? "border-[#9B7A92]" : "border-gray-200"
+                  thumbnail === image ? "border-[#00FF41]" : "border-gray-600"
                 }`}
               >
                 <img
@@ -159,7 +159,7 @@ const ProductDetails = () => {
                   width="16"
                   height="16"
                   viewBox="0 0 24 24"
-                  fill={i < (product.rating || 4) ? "#9B7A92" : "#E5E7EB"}
+                  fill={i < (product.rating || 4) ? "#00FF41" : "#4B5563"}
                   className="w-5 h-5"
                 >
                   <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
@@ -173,7 +173,7 @@ const ProductDetails = () => {
           {/* Price */}
           <div className="mb-6">
             <p className="text-gray-500 line-through">₹{product.price}</p>
-            <p className="text-2xl font-semibold text-[#9B7A92]">
+            <p className="text-2xl font-semibold text-[#00FF41]">
               ₹{product.offerPrice}
             </p>
             <p className="text-sm text-gray-500">(inclusive of all taxes)</p>
@@ -207,13 +207,13 @@ const ProductDetails = () => {
           <div className="flex gap-4 mb-8">
             <button
               onClick={handleAddToCart}
-              className="flex-1 py-3 px-6 bg-[#9B7A92] text-white rounded-md hover:bg-[#8A6A82] transition"
+              className="flex-1 py-3 px-6 bg-[#00FF41] text-black rounded-md hover:bg-[#00CC33] transition"
             >
               Add to Cart
             </button>
             <button
               onClick={handleBuyNow}
-              className="flex-1 py-3 px-6 bg-white border-2 border-[#9B7A92] text-[#9B7A92] rounded-md hover:bg-[#9B7A92]/5 transition"
+              className="flex-1 py-3 px-6 bg-gray-800 border-2 border-[#00FF41] text-[#00FF41] rounded-md hover:bg-[#00FF41]/5 transition"
             >
               Buy Now
             </button>

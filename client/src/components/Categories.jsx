@@ -27,7 +27,7 @@ const Categories = () => {
         {currentPath !== "products" && (
           <button
             onClick={() => navigate("/products")}
-            className="text-[#9B7A92] hover:text-[#7C5A6B] transition-colors"
+            className="text-[#00FF41] hover:text-[#00CC33] transition-colors"
           >
             View All Products
           </button>
@@ -40,7 +40,7 @@ const Categories = () => {
             <div
               key={index}
               className={`group cursor-pointer py-5 px-3 gap-2 rounded-lg flex flex-col justify-center items-center transition-all ${
-                isActive ? "ring-2 ring-[#9B7A92] ring-offset-2" : ""
+                isActive ? "ring-2 ring-[#00FF41] ring-offset-2" : ""
               }`}
               style={{ backgroundColor: category.bgColor }}
               onClick={() => handleCategoryClick(category.path)}
@@ -53,8 +53,8 @@ const Categories = () => {
                 alt={category.text}
               />
               <p
-                className={`text-sm font-medium ${
-                  isActive ? "text-[#9B7A92]" : ""
+                className={`text-sm font-medium text-black ${
+                  isActive ? "text-[#00FF41]" : ""
                 }`}
               >
                 {category.text}

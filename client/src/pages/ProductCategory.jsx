@@ -34,8 +34,8 @@ const ProductCategory = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#9B7A92]"></div>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00FF41]"></div>
       </div>
     );
   }
@@ -64,9 +64,9 @@ const ProductCategory = () => {
           <h1 className="text-3xl font-semibold text-gray-800">
             {categoryDetails.text}
           </h1>
-          <div className="w-16 h-0.5 bg-[#9B7A92] rounded-full mt-2"></div>
+          <div className="w-16 h-0.5 bg-[#00FF41] rounded-full mt-2"></div>
         </div>
-        <p className="text-gray-600 mt-4">
+        <p className="text-gray-300 mt-4">
           {filteredProducts.length}{" "}
           {filteredProducts.length === 1 ? "product" : "products"} in this
           category
@@ -89,8 +89,8 @@ const ProductCategory = () => {
       )}
 
       {/* Category Description */}
-      <div className="mt-12 p-6 bg-[#9B7A92]/5 rounded-lg">
-        <h2 className="text-xl font-medium text-gray-800 mb-4">
+      <div className="mt-12 p-6 bg-gray-900 rounded-lg border border-gray-700">
+        <h2 className="text-xl font-medium text-white mb-4">
           About {categoryDetails.text}
         </h2>
         <p className="text-gray-600">
