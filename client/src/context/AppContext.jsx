@@ -12,7 +12,13 @@ import toast from "react-hot-toast";
 
 // Configure axios with environment variable
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL + "/api";
+
+// Set base URL for axios - use environment variable or fallback to deployed URL
+const backendURL =
+  import.meta.env.VITE_BACKEND_URL || "https://grocery-app-abnm.onrender.com";
+axios.defaults.baseURL = backendURL + "/api";
+
+console.log("Backend URL:", backendURL);
 
 export const AppContext = createContext();
 
@@ -47,7 +53,9 @@ export const AppContextProvider = ({ children }) => {
   });
 
   // API base URL from environment variable
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + "/api";
+  const API_BASE_URL =
+    import.meta.env.VITE_BACKEND_URL ||
+    "https://grocery-app-abnm.onrender.com" + "/api";
 
   // Check seller authentication on mount
   const checkSellerAuth = useCallback(async () => {

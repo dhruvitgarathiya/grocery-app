@@ -50,6 +50,8 @@ const allowedOrigins = [
   process.env.CLIENT_URL || "http://localhost:5173",
   "http://localhost:3000",
   "http://localhost:5173",
+  "https://grocery-app-1-w432.onrender.com", // Add your deployed frontend URL
+  "https://grocery-app-abnm.onrender.com", // Add your backend URL as well
 ];
 
 app.use(
@@ -58,9 +60,15 @@ app.use(
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
 
+      // Allow all render.com subdomains for flexibility
+      if (origin && origin.includes("onrender.com")) {
+        return callback(null, true);
+      }
+
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
+        console.log("CORS blocked origin:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
