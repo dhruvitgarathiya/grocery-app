@@ -33,9 +33,7 @@ const AddressManagement = () => {
   const testAuth = async () => {
     try {
       console.log("Testing authentication...");
-      const response = await fetch(`${API_BASE_URL}/test-auth`, {
-        credentials: "include",
-      });
+      const response = await fetch(`${API_BASE_URL}/test-auth`);
       const data = await response.json();
       console.log("Test auth response:", data);
       alert(`Auth test: ${JSON.stringify(data, null, 2)}`);
@@ -48,9 +46,7 @@ const AddressManagement = () => {
   const testCookie = async () => {
     try {
       console.log("Testing cookie setting...");
-      const response = await fetch(`${API_BASE_URL}/test-cookie`, {
-        credentials: "include",
-      });
+      const response = await fetch(`${API_BASE_URL}/test-cookie`);
       const data = await response.json();
       console.log("Test cookie response:", data);
       console.log("Current cookies:", document.cookie);
@@ -70,9 +66,7 @@ const AddressManagement = () => {
   const testEnv = async () => {
     try {
       console.log("Testing environment...");
-      const response = await fetch(`${API_BASE_URL}/env-test`, {
-        credentials: "include",
-      });
+      const response = await fetch(`${API_BASE_URL}/env-test`);
       const data = await response.json();
       console.log("Environment test response:", data);
       alert(`Environment test: ${JSON.stringify(data, null, 2)}`);
@@ -85,9 +79,7 @@ const AddressManagement = () => {
   const testDebugCookies = async () => {
     try {
       console.log("Testing debug cookies...");
-      const response = await fetch(`${API_BASE_URL}/debug-cookies`, {
-        credentials: "include",
-      });
+      const response = await fetch(`${API_BASE_URL}/debug-cookies`);
       const data = await response.json();
       console.log("Debug cookies response:", data);
       alert(`Debug cookies: ${JSON.stringify(data, null, 2)}`);

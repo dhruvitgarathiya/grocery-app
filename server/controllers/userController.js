@@ -43,26 +43,11 @@ export const register = async (req, res) => {
       expiresIn: "7d",
     });
 
-    const cookieOptions = {
-      httpOnly: true, // prevent js to access the cookie
-      secure: process.env.NODE_ENV === "production", // enable secure in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // use none in production for cross-site
-      maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
-      path: "/", // ensure cookie is available for all paths
-      domain:
-        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined, // set domain for production
-    };
-
-    console.log("Setting cookie with options:", cookieOptions);
-    console.log("NODE_ENV:", process.env.NODE_ENV);
-    console.log("Request origin:", req.headers.origin);
-    console.log("Request host:", req.headers.host);
-    console.log("Request referer:", req.headers.referer);
-    console.log("Is production:", process.env.NODE_ENV === "production");
-    console.log("Cookie secure:", cookieOptions.secure);
-    console.log("Cookie sameSite:", cookieOptions.sameSite);
-
-    res.cookie("token", token, cookieOptions);
+    // Remove cookie setting - we'll use localStorage instead
+    console.log(
+      "Token generated for localStorage:",
+      token.substring(0, 20) + "..."
+    );
 
     return res.status(201).json({
       success: true,
@@ -135,29 +120,13 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
-    console.log("Token generated:", token.substring(0, 20) + "...");
+    console.log(
+      "Token generated for localStorage:",
+      token.substring(0, 20) + "..."
+    );
 
-    const cookieOptions = {
-      httpOnly: true, // prevent js to access the cookie
-      secure: process.env.NODE_ENV === "production", // enable secure in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // use none in production for cross-site
-      maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
-      path: "/", // ensure cookie is available for all paths
-      domain:
-        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined, // set domain for production
-    };
-
-    console.log("Setting cookie with options:", cookieOptions);
-    console.log("NODE_ENV:", process.env.NODE_ENV);
-    console.log("Request origin:", req.headers.origin);
-    console.log("Request host:", req.headers.host);
-    console.log("Request referer:", req.headers.referer);
-    console.log("Is production:", process.env.NODE_ENV === "production");
-    console.log("Cookie secure:", cookieOptions.secure);
-    console.log("Cookie sameSite:", cookieOptions.sameSite);
-
-    res.cookie("token", token, cookieOptions);
-    console.log("Cookie set successfully");
+    // Remove cookie setting - we'll use localStorage instead
+    console.log("Login successful, token ready for localStorage");
 
     const responseData = {
       success: true,
@@ -220,14 +189,8 @@ export const isAuth = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      path: "/",
-      domain:
-        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
-    });
+    // No need to clear cookies since we're using localStorage
+    console.log("User logged out, token should be removed from localStorage");
 
     return res.json({
       success: true,

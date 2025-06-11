@@ -81,7 +81,6 @@ const Login = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
           body: JSON.stringify({
             name: formData.name.trim(),
             email: formData.email.toLowerCase(),
@@ -92,11 +91,17 @@ const Login = () => {
         const data = await response.json();
 
         if (data.success) {
-          setUser({
+          const userData = {
             id: data.user.id,
             name: data.user.name,
             email: data.user.email,
-          });
+          };
+
+          // Store token and user data in localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(userData));
+
+          setUser(userData);
           setShowUserLogin(false);
           toast.success("Registration successful! Welcome to GreenCart!");
         } else {
@@ -123,7 +128,6 @@ const Login = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
           body: JSON.stringify({
             email: formData.email.toLowerCase(),
             password: formData.password,
@@ -149,6 +153,11 @@ const Login = () => {
             email: data.user.email,
           };
           console.log("Setting user after login:", userData);
+
+          // Store token and user data in localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(userData));
+
           setUser(userData);
           setShowUserLogin(false);
           toast.success(`Welcome back, ${data.user.name}!`);

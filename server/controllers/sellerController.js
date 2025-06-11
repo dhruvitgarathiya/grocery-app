@@ -23,16 +23,11 @@ export const sellerLogin = async (req, res) => {
         expiresIn: "7d",
       });
 
-      res.cookie("sellerToken", token, {
-        httpOnly: true, // prevent js to access the cookie
-        secure: process.env.NODE_ENV === "production", // use secure cookie in production
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        // csrf protection
-        maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
-        path: "/",
-        domain:
-          process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
-      });
+      // Remove cookie setting - we'll use localStorage instead
+      console.log(
+        "Seller token generated for localStorage:",
+        token.substring(0, 20) + "..."
+      );
 
       return res.status(200).json({
         success: true,
@@ -57,7 +52,12 @@ export const sellerLogin = async (req, res) => {
 //seller auth
 export const isSellerAuth = async (req, res) => {
   try {
-    const { sellerToken } = req.cookies;
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    const sellerToken =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : null;
 
     if (!sellerToken) {
       return res.status(401).json({
@@ -92,14 +92,8 @@ export const isSellerAuth = async (req, res) => {
 
 export const sellerLogout = async (req, res) => {
   try {
-    res.clearCookie("sellerToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-      path: "/",
-      domain:
-        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
-    });
+    // No need to clear cookies since we're using localStorage
+    console.log("Seller logged out, token should be removed from localStorage");
 
     return res.json({
       success: true,

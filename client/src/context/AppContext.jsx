@@ -15,12 +15,18 @@ const backendURL =
   (import.meta.env.VITE_BACKEND_URL ||
     "https://grocery-app-abnm.onrender.com") + "/api";
 axios.defaults.baseURL = backendURL;
-axios.defaults.withCredentials = true;
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
 // Add axios interceptors right after the configuration
 axios.interceptors.request.use(
   (config) => {
+    // Add Authorization header with token from localStorage
+    const token =
+      localStorage.getItem("token") || localStorage.getItem("sellerToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     console.log("Request:", config.url, config.headers);
     return config;
   },
@@ -81,61 +87,77 @@ export const AppContextProvider = ({ children }) => {
   // Check seller authentication on mount
   const checkSellerAuth = useCallback(async () => {
     try {
-      const response = await axios.get("/seller/is-auth");
-      if (response.data.success) {
-        setIsSeller(true);
-        // Fetch seller orders if authenticated
-        fetchSellerOrders();
+      // Get seller token from localStorage
+      const sellerToken = localStorage.getItem("sellerToken");
+
+      if (sellerToken) {
+        // Verify token by making a request to is-auth endpoint
+        const response = await axios.get("/seller/is-auth");
+        if (response.data.success) {
+          setIsSeller(true);
+          // Fetch seller orders if authenticated
+          fetchSellerOrders();
+        } else {
+          // Token is invalid, clear localStorage
+          localStorage.removeItem("sellerToken");
+          setIsSeller(false);
+        }
+      } else {
+        setIsSeller(false);
       }
     } catch (error) {
-      // Seller is not authenticated, which is fine
+      // Seller is not authenticated, clear invalid token
+      localStorage.removeItem("sellerToken");
       setIsSeller(false);
     }
-  }, []);
+  }, [fetchSellerOrders]);
 
   // Check user authentication on mount
   const checkUserAuth = useCallback(async () => {
     try {
-      console.log("Checking user authentication...");
-      console.log("Current axios baseURL:", axios.defaults.baseURL);
-      console.log("Current axios credentials:", axios.defaults.withCredentials);
+      console.log("Checking user authentication from localStorage...");
 
-      const response = await axios.get("/user/is-auth", {
-        withCredentials: true,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      // Get token from localStorage
+      const token = localStorage.getItem("token");
+      const userData = localStorage.getItem("user");
 
-      console.log("Auth response:", response.data);
-      if (response.data.success) {
-        const userData = {
-          id: response.data.user._id,
-          name: response.data.user.name,
-          email: response.data.user.email,
-        };
-        setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
+      if (token && userData) {
+        // Verify token by making a request to is-auth endpoint
+        const response = await axios.get("/user/is-auth");
+
+        if (response.data.success) {
+          const user = JSON.parse(userData);
+          setUser(user);
+          console.log("User authenticated from localStorage:", user);
+        } else {
+          // Token is invalid, clear localStorage
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        }
+      } else {
+        setUser(null);
       }
     } catch (error) {
       console.error(
         "Authentication error:",
         error.response?.data || error.message
       );
-      setUser(null);
+      // Clear invalid data
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
+      setUser(null);
     }
   }, []);
 
   // User logout function
   const userLogout = useCallback(async () => {
     try {
-      await axios.get("/user/logout", {
-        withCredentials: true,
-      });
-      setUser(null);
+      // Clear localStorage instead of making API call
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
+
+      setUser(null);
       setCartItems({});
       setAddresses([]);
       setSelectedAddress(null);
@@ -144,10 +166,11 @@ export const AppContextProvider = ({ children }) => {
       navigate("/");
       toast.success("Logged out successfully");
     } catch (error) {
-      console.error("Logout error:", error.response?.data || error.message);
-      // Clean up local state even if the request fails
-      setUser(null);
+      console.error("Logout error:", error);
+      // Clean up local state even if there's an error
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
+      setUser(null);
       setCartItems({});
       setAddresses([]);
       setSelectedAddress(null);
@@ -160,13 +183,17 @@ export const AppContextProvider = ({ children }) => {
   // Seller logout function
   const sellerLogout = useCallback(async () => {
     try {
-      await axios.get("/seller/logout");
+      // Clear localStorage instead of making API call
+      localStorage.removeItem("sellerToken");
+
       setIsSeller(false);
       setSellerOrders([]);
       navigate("/");
       toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout error:", error);
+      // Clean up local state even if there's an error
+      localStorage.removeItem("sellerToken");
       setIsSeller(false);
       setSellerOrders([]);
       navigate("/");

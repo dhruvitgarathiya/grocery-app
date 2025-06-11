@@ -2,11 +2,19 @@ import jwt from "jsonwebtoken";
 
 const authUser = async (req, res, next) => {
   try {
-    console.log("Auth middleware - cookies:", req.cookies);
-    const { token } = req.cookies;
+    console.log("Auth middleware - headers:", req.headers);
+
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    const token =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : null;
 
     if (!token) {
-      console.log("Auth middleware - No token provided");
+      console.log(
+        "Auth middleware - No token provided in Authorization header"
+      );
       return res.status(401).json({
         success: false,
         message: "Not authorized - No token provided",

@@ -43,7 +43,6 @@ const SellerLogin = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -53,6 +52,9 @@ const SellerLogin = () => {
       const data = await response.json();
 
       if (data.success) {
+        // Store seller token in localStorage
+        localStorage.setItem("sellerToken", data.token);
+
         setIsSeller(true);
         setShowSellerLogin(false);
         toast.success("Seller login successful!");
