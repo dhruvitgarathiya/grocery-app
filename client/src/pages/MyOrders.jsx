@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useAppcontext } from "../context/AppContext";
+import { assets } from "../assets/assets";
 
 const MyOrders = () => {
   const {
@@ -153,20 +154,23 @@ const MyOrders = () => {
                     <div key={item._id} className="flex items-center gap-4">
                       <div className="w-16 h-16 bg-gray-800 rounded-md overflow-hidden">
                         <img
-                          src={item.product.image[0]}
-                          alt={item.product.name}
+                          src={item.product?.image?.[0] || assets.box_icon}
+                          alt={item.product?.name || "Product"}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = assets.box_icon;
+                          }}
                         />
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-white">
-                          {item.product.name}
+                          {item.product?.name || "Product Name"}
                         </p>
                         <p className="text-sm text-gray-300">
                           Quantity: {item.quantity}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          {item.product.offerPrice ? (
+                          {item.product?.offerPrice ? (
                             <>
                               <span className="text-[#00FF41] font-medium">
                                 ₹{item.product.offerPrice}
@@ -177,7 +181,7 @@ const MyOrders = () => {
                             </>
                           ) : (
                             <span className="text-[#00FF41] font-medium">
-                              ₹{item.product.price}
+                              ₹{item.product?.price || 0}
                             </span>
                           )}
                         </div>
@@ -185,8 +189,9 @@ const MyOrders = () => {
                       <div className="text-right">
                         <p className="font-medium text-[#00FF41]">
                           ₹
-                          {(item.product.offerPrice || item.product.price) *
-                            item.quantity}
+                          {(item.product?.offerPrice ||
+                            item.product?.price ||
+                            0) * item.quantity}
                         </p>
                       </div>
                     </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { assets } from "../../assets/assets";
 import { useAppcontext } from "../../context/AppContext";
+import { assets } from "../../assets/assets";
 
 const Orders = () => {
   const {
@@ -201,24 +201,18 @@ const Orders = () => {
                           e.target.value
                         )
                       }
-                      className="px-2 py-1 text-sm border border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-[#00FF41] bg-gray-800 text-white"
-                      defaultValue=""
+                      className="px-3 py-1 border border-gray-600 rounded-md bg-gray-800 text-white text-sm"
                     >
-                      <option value="" disabled>
-                        Update Status
-                      </option>
-                      {getNextStatus(order.status) && (
-                        <option value={getNextStatus(order.status)}>
-                          Mark as {getNextStatus(order.status)}
-                        </option>
-                      )}
-                      <option value="cancelled">Cancel Order</option>
+                      <option value="">Update Status</option>
+                      <option value="processing">Processing</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
                     </select>
                   )}
                 </div>
               </div>
 
-              {/* Order Content */}
+              {/* Order Details */}
               <div className="p-4 md:p-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Products */}
@@ -227,20 +221,25 @@ const Orders = () => {
                     {order.items.map((item) => (
                       <div key={item._id} className="flex items-center gap-3">
                         <img
-                          src={item.product.image[0]}
-                          alt={item.product.name}
+                          src={item.product?.image?.[0] || assets.box_icon}
+                          alt={item.product?.name || "Product"}
                           className="w-12 h-12 object-cover rounded"
+                          onError={(e) => {
+                            e.target.src = assets.box_icon;
+                          }}
                         />
                         <div>
                           <p className="font-medium text-white">
-                            {item.product.name}
+                            {item.product?.name || "Product Name"}
                           </p>
                           <p className="text-sm text-gray-500">
                             Quantity: {item.quantity}
                           </p>
                           <p className="text-sm text-gray-500">
                             Price: ₹
-                            {item.product.offerPrice || item.product.price}
+                            {item.product?.offerPrice ||
+                              item.product?.price ||
+                              0}
                           </p>
                         </div>
                       </div>
@@ -249,44 +248,46 @@ const Orders = () => {
 
                   {/* Customer Details */}
                   <div className="space-y-3">
-                    <h3 className="font-medium text-white">Delivery Address</h3>
+                    <h3 className="font-medium text-white">Customer Details</h3>
                     {order.address && (
-                      <div className="text-sm text-gray-600">
-                        <p className="font-medium text-white">
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-300">
+                          <span className="font-medium">Name:</span>{" "}
                           {order.address.firstName} {order.address.lastName}
                         </p>
-                        <p>{order.address.street}</p>
-                        <p>
-                          {order.address.city}, {order.address.state}{" "}
-                          {order.address.zipcode}
+                        <p className="text-sm text-gray-300">
+                          <span className="font-medium">Email:</span>{" "}
+                          {order.address.email}
                         </p>
-                        <p>{order.address.country}</p>
-                        <p className="mt-1">{order.address.phone}</p>
+                        <p className="text-sm text-gray-300">
+                          <span className="font-medium">Phone:</span>{" "}
+                          {order.address.phone}
+                        </p>
+                        <p className="text-sm text-gray-300">
+                          <span className="font-medium">Address:</span>{" "}
+                          {order.address.street}, {order.address.city},{" "}
+                          {order.address.state} {order.address.zipcode}
+                        </p>
                       </div>
                     )}
                   </div>
+                </div>
 
-                  {/* Order Details */}
-                  <div className="space-y-3">
-                    <h3 className="font-medium text-white">Order Details</h3>
-                    <div className="text-sm text-gray-600">
+                {/* Order Summary */}
+                <div className="mt-6 pt-4 border-t border-gray-700">
+                  <div className="flex justify-between items-center">
+                    <div>
                       <p className="text-sm text-gray-300">
-                        Date: {new Date(order.createdAt).toLocaleDateString()}
+                        Order Date:{" "}
+                        {new Date(order.createdAt).toLocaleDateString()}
                       </p>
                       <p className="text-sm text-gray-300">
-                        Payment Method: {order.paymentType}
+                        Payment: {order.paymentType}
                       </p>
-                      <p className="font-medium text-white mt-2">
-                        Total Amount: ₹{order.amount}
-                      </p>
-                      <p
-                        className={`inline-block px-2 py-1 rounded text-sm ${
-                          order.isPaid
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {order.isPaid ? "Paid" : "Payment Pending"}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-medium text-white">
+                        Total: ₹{order.amount}
                       </p>
                     </div>
                   </div>
