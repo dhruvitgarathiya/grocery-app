@@ -48,7 +48,13 @@ export const addProduct = async (req, res) => {
         images.map(async (item, index) => {
           try {
             console.log(`Uploading image ${index + 1}:`, item.originalname);
-            let result = await cloudinary.uploader.upload(item.path, {
+
+            // Convert buffer to base64 for Cloudinary upload
+            const base64Image = `data:${
+              item.mimetype
+            };base64,${item.buffer.toString("base64")}`;
+
+            let result = await cloudinary.uploader.upload(base64Image, {
               resource_type: "image",
             });
             console.log(

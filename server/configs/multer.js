@@ -1,25 +1,8 @@
 import multer from "multer";
-import fs from "fs";
-import path from "path";
 
-// Ensure uploads directory exists
-const uploadsDir = "uploads";
-if (!fs.existsSync(uploadsDir)) {
-  console.log("Creating uploads directory...");
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    console.log("Multer destination called for file:", file.originalname);
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const filename = Date.now() + "-" + file.originalname;
-    console.log("Generated filename:", filename);
-    cb(null, filename);
-  },
-});
+// Use memory storage instead of disk storage to avoid file system issues
+// This keeps files in memory and avoids ENOENT errors in production
+const storage = multer.memoryStorage();
 
 export const upload = multer({
   storage: storage,
