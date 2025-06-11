@@ -67,6 +67,21 @@ const AddressManagement = () => {
     }
   };
 
+  const testEnv = async () => {
+    try {
+      console.log("Testing environment...");
+      const response = await fetch(`${API_BASE_URL}/env-test`, {
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log("Environment test response:", data);
+      alert(`Environment test: ${JSON.stringify(data, null, 2)}`);
+    } catch (error) {
+      console.error("Environment test error:", error);
+      alert(`Environment test error: ${error.message}`);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prev) => ({ ...prev, [name]: value }));
@@ -151,6 +166,12 @@ const AddressManagement = () => {
             className="text-blue-400 hover:text-blue-300 transition text-sm"
           >
             Test Cookie
+          </button>
+          <button
+            onClick={testEnv}
+            className="text-blue-400 hover:text-blue-300 transition text-sm"
+          >
+            Test Env
           </button>
           <Link
             to="/cart"

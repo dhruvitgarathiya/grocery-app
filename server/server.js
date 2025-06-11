@@ -29,6 +29,8 @@ console.log("PORT:", process.env.PORT);
 console.log("MONGODB_URI:", process.env.MONGODB_URI ? "Set" : "Not set");
 console.log("JWT_SECRET:", process.env.JWT_SECRET ? "Set" : "Not set");
 console.log("CLIENT_URL:", process.env.CLIENT_URL || "http://localhost:5173");
+console.log("NODE_ENV:", process.env.NODE_ENV || "development");
+console.log("Is Production:", process.env.NODE_ENV === "production");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -54,7 +56,32 @@ app.use((req, res, next) => {
 // Simple CORS configuration
 app.use(
   cors({
-    origin: true,
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://grocery-app-abnm.onrender.com",
+        "https://greencart-frontend.vercel.app",
+        "https://greencart-frontend.netlify.app",
+        "https://greencart.vercel.app",
+        "https://greencart.netlify.app",
+      ];
+
+      if (
+        allowedOrigins.indexOf(origin) !== -1 ||
+        origin.includes("onrender.com") ||
+        origin.includes("vercel.app") ||
+        origin.includes("netlify.app")
+      ) {
+        callback(null, true);
+      } else {
+        console.log("CORS blocked origin:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: [
@@ -98,6 +125,18 @@ app.get("/api/test-cookie", (req, res) => {
     message: "Test cookie set",
     cookies: req.cookies,
     instruction: "Check browser cookies to see if testCookie is set",
+  });
+});
+
+// Environment test endpoint
+app.get("/api/env-test", (req, res) => {
+  res.json({
+    NODE_ENV: process.env.NODE_ENV || "development",
+    isProduction: process.env.NODE_ENV === "production",
+    PORT: process.env.PORT,
+    JWT_SECRET: process.env.JWT_SECRET ? "Set" : "Not set",
+    requestOrigin: req.headers.origin,
+    requestHost: req.headers.host,
   });
 });
 
