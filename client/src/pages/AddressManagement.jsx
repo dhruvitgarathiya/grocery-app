@@ -162,7 +162,7 @@ const AddressManagement = () => {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl md:text-3xl font-medium">Address Management</h1>
         <div className="flex gap-2">
-          <button
+          {/* <button 
             onClick={testAuth}
             className="text-blue-400 hover:text-blue-300 transition text-sm"
           >
@@ -185,7 +185,7 @@ const AddressManagement = () => {
             className="text-blue-400 hover:text-blue-300 transition text-sm"
           >
             Test Debug Cookies
-          </button>
+          </button>*/}
           <Link
             to="/cart"
             className="text-[#00FF41] hover:text-[#00CC33] transition"
