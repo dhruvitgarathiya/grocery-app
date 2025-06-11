@@ -49,7 +49,8 @@ export const register = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // use none in production for cross-site
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
       path: "/", // ensure cookie is available for all paths
-      // domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined, // set domain for production
+      domain:
+        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined, // set domain for production
     };
 
     console.log("Setting cookie with options:", cookieOptions);
@@ -142,7 +143,8 @@ export const login = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // use none in production for cross-site
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
       path: "/", // ensure cookie is available for all paths
-      // domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined, // set domain for production
+      domain:
+        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined, // set domain for production
     };
 
     console.log("Setting cookie with options:", cookieOptions);
@@ -223,7 +225,8 @@ export const logout = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
-      // domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+      domain:
+        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
     });
 
     return res.json({

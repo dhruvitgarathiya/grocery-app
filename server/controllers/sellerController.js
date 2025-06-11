@@ -29,6 +29,9 @@ export const sellerLogin = async (req, res) => {
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         // csrf protection
         maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
+        path: "/",
+        domain:
+          process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
       });
 
       return res.status(200).json({
@@ -93,6 +96,9 @@ export const sellerLogout = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      path: "/",
+      domain:
+        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
     });
 
     return res.json({

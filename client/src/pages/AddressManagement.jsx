@@ -82,6 +82,21 @@ const AddressManagement = () => {
     }
   };
 
+  const testDebugCookies = async () => {
+    try {
+      console.log("Testing debug cookies...");
+      const response = await fetch(`${API_BASE_URL}/debug-cookies`, {
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log("Debug cookies response:", data);
+      alert(`Debug cookies: ${JSON.stringify(data, null, 2)}`);
+    } catch (error) {
+      console.error("Debug cookies error:", error);
+      alert(`Debug cookies error: ${error.message}`);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prev) => ({ ...prev, [name]: value }));
@@ -172,6 +187,12 @@ const AddressManagement = () => {
             className="text-blue-400 hover:text-blue-300 transition text-sm"
           >
             Test Env
+          </button>
+          <button
+            onClick={testDebugCookies}
+            className="text-blue-400 hover:text-blue-300 transition text-sm"
+          >
+            Test Debug Cookies
           </button>
           <Link
             to="/cart"

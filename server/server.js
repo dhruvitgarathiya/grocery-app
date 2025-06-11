@@ -69,14 +69,20 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
+      console.log("CORS request from origin:", origin);
+
       // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+      if (!origin) {
+        console.log("Allowing request with no origin");
+        return callback(null, true);
+      }
 
       // Allow all subdomains of vercel.app, onrender.com, netlify.app
       if (
         allowedOrigins.includes(origin) ||
         /(\.vercel\.app|\.onrender\.com|\.netlify\.app)$/.test(origin)
       ) {
+        console.log("Allowing origin:", origin);
         callback(null, true);
       } else {
         console.log("CORS blocked origin:", origin);
@@ -117,10 +123,11 @@ app.get("/api/test-cookie", (req, res) => {
   console.log("Setting test cookie");
   res.cookie("testCookie", "testValue", {
     httpOnly: false, // make it accessible to JavaScript for testing
-    secure: false,
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000, // 1 day
     path: "/",
+    domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
   });
   res.json({
     message: "Test cookie set",
@@ -138,6 +145,48 @@ app.get("/api/env-test", (req, res) => {
     JWT_SECRET: process.env.JWT_SECRET ? "Set" : "Not set",
     requestOrigin: req.headers.origin,
     requestHost: req.headers.host,
+    cookies: req.cookies,
+    headers: {
+      origin: req.headers.origin,
+      host: req.headers.host,
+      referer: req.headers.referer,
+      "user-agent": req.headers["user-agent"],
+    },
+  });
+});
+
+// Debug endpoint for cookie testing
+app.get("/api/debug-cookies", (req, res) => {
+  console.log("Debug cookies - Request headers:", req.headers);
+  console.log("Debug cookies - Request cookies:", req.cookies);
+
+  // Set a test cookie with all possible configurations
+  res.cookie("debugCookie", "testValue", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
+    path: "/",
+    domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+  });
+
+  res.json({
+    message: "Debug cookie endpoint",
+    environment: {
+      NODE_ENV: process.env.NODE_ENV,
+      isProduction: process.env.NODE_ENV === "production",
+    },
+    request: {
+      origin: req.headers.origin,
+      host: req.headers.host,
+      cookies: req.cookies,
+    },
+    cookieSettings: {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      domain:
+        process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+    },
   });
 });
 
