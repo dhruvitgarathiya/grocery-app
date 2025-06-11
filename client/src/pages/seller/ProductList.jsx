@@ -123,6 +123,18 @@ const ProductList = () => {
     }
   };
 
+  // Edit product
+  const handleEdit = (productId) => {
+    // For now, just show a toast message
+    // You can implement navigation to an edit page or open a modal
+    toast.success(
+      `Edit functionality for product ${productId.slice(
+        -8
+      )} will be implemented soon!`
+    );
+    console.log("Edit product:", productId);
+  };
+
   // Handle page change
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -431,14 +443,39 @@ const ProductList = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center gap-2">
+                        {/* InStock Toggle Button */}
+                        <button
+                          onClick={() =>
+                            toggleInStock(product._id, product.inStock)
+                          }
+                          className={`px-3 py-1 rounded-md transition ${
+                            product.inStock
+                              ? "text-green-400 hover:text-green-300 hover:bg-green-900/20"
+                              : "text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                          }`}
+                          title={
+                            product.inStock
+                              ? "Mark as Out of Stock"
+                              : "Mark as In Stock"
+                          }
+                        >
+                          {product.inStock ? "In Stock" : "Out of Stock"}
+                        </button>
+
+                        {/* Edit Button */}
+                        <button
+                          onClick={() => handleEdit(product._id)}
+                          className="text-blue-400 hover:text-blue-300 px-3 py-1 rounded-md hover:bg-blue-900/20 transition"
+                        >
+                          Edit
+                        </button>
+
+                        {/* Delete Button */}
                         <button
                           onClick={() => handleDelete(product._id)}
                           className="text-red-400 hover:text-red-300 px-3 py-1 rounded-md hover:bg-red-900/20 transition"
                         >
                           Delete
-                        </button>
-                        <button className="text-blue-400 hover:text-blue-300 px-3 py-1 rounded-md hover:bg-blue-900/20 transition">
-                          Edit
                         </button>
                       </div>
                     </td>
