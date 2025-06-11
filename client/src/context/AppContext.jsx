@@ -72,17 +72,27 @@ export const AppContextProvider = ({ children }) => {
   // Check user authentication on mount
   const checkUserAuth = useCallback(async () => {
     try {
+      console.log("Checking user authentication...");
+
+      // Test if cookies are being sent
+      const testResponse = await axios.get("/test-auth");
+      console.log("Test auth response:", testResponse.data);
+
       const response = await axios.get("/user/is-auth");
+      console.log("Auth response:", response.data);
       if (response.data.success) {
-        setUser({
+        const userData = {
           id: response.data.user._id,
           name: response.data.user.name,
           email: response.data.user.email,
-        });
+        };
+        console.log("Setting user:", userData);
+        setUser(userData);
         // Don't call fetchUserOrders here to avoid circular dependency
         // Let the MyOrders component handle it when user is available
       }
     } catch (error) {
+      console.log("User not authenticated:", error.message);
       // User is not authenticated, which is fine
       setUser(null);
     }
@@ -508,8 +518,16 @@ export const AppContextProvider = ({ children }) => {
       throw new Error("User not logged in");
     }
 
-    console.log("Adding address for user:", user.id);
+    console.log("Adding address for user:", user);
+    console.log("User object:", user);
+    console.log("User ID:", user.id);
     console.log("API Base URL:", axios.defaults.baseURL);
+    console.log("Axios defaults:", {
+      baseURL: axios.defaults.baseURL,
+      withCredentials: axios.defaults.withCredentials,
+      headers: axios.defaults.headers,
+    });
+
     const response = await axios.post("/address/add", {
       address: addressData,
       userId: user.id,

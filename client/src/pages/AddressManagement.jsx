@@ -43,6 +43,9 @@ const AddressManagement = () => {
       return;
     }
 
+    console.log("User before adding address:", user);
+    console.log("User ID:", user.id);
+
     setLoading(true);
     try {
       await addAddress(newAddress);
@@ -60,6 +63,7 @@ const AddressManagement = () => {
       setShowForm(false);
       toast.success("Address added successfully!");
     } catch (error) {
+      console.error("Error adding address:", error);
       toast.error("Failed to add address");
     } finally {
       setLoading(false);

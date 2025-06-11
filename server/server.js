@@ -73,6 +73,17 @@ app.get("/", (req, res) => {
   res.json({ message: "API is working" });
 });
 
+// Test authentication endpoint
+app.get("/api/test-auth", (req, res) => {
+  console.log("Test auth - cookies:", req.cookies);
+  console.log("Test auth - headers:", req.headers);
+  res.json({
+    message: "Test auth endpoint",
+    cookies: req.cookies,
+    hasToken: !!req.cookies.token,
+  });
+});
+
 app.use("/api/user", userRouter);
 app.use("/api/seller", sellerRouter);
 app.use("/api/product", porductRouter);
