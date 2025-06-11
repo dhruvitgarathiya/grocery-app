@@ -11,7 +11,9 @@ const SellerLogin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + "/api";
+  const API_BASE_URL =
+    (import.meta.env.VITE_BACKEND_URL ||
+      "https://grocery-app-abnm.onrender.com") + "/api";
 
   const handleChange = (e) => {
     const { name, value } = e.target;

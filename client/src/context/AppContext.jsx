@@ -12,8 +12,9 @@ import toast from "react-hot-toast";
 
 // Set base URL for axios - use environment variable or fallback to deployed URL
 const backendURL =
-  import.meta.env.VITE_BACKEND_URL || "https://grocery-app-abnm.onrender.com";
-axios.defaults.baseURL = backendURL + "/api";
+  (import.meta.env.VITE_BACKEND_URL ||
+    "https://grocery-app-abnm.onrender.com") + "/api";
+axios.defaults.baseURL = backendURL;
 
 // Configure axios for CORS
 axios.defaults.withCredentials = true;
@@ -52,11 +53,6 @@ export const AppContextProvider = ({ children }) => {
     delivered: 0,
     cancelled: 0,
   });
-
-  // API base URL from environment variable
-  const API_BASE_URL =
-    import.meta.env.VITE_BACKEND_URL ||
-    "https://grocery-app-abnm.onrender.com" + "/api";
 
   // Check seller authentication on mount
   const checkSellerAuth = useCallback(async () => {
@@ -489,24 +485,20 @@ export const AppContextProvider = ({ children }) => {
     if (!user) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/address/get`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ userId: user.id }),
+      console.log("Fetching addresses for user:", user.id);
+      console.log("API Base URL:", axios.defaults.baseURL);
+      const response = await axios.post("/address/get", {
+        userId: user.id,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setAddresses(data.addresses || []);
+      if (response.data.success) {
+        setAddresses(response.data.addresses || []);
       } else {
-        console.error("Failed to fetch addresses:", data.message);
+        console.error("Failed to fetch addresses:", response.data.message);
       }
     } catch (error) {
       console.error("Error fetching addresses:", error);
+      console.error("Error response:", error.response);
     }
   };
 
@@ -516,26 +508,19 @@ export const AppContextProvider = ({ children }) => {
       throw new Error("User not logged in");
     }
 
-    const response = await fetch(`${API_BASE_URL}/address/add`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        address: addressData,
-        userId: user.id,
-      }),
+    console.log("Adding address for user:", user.id);
+    console.log("API Base URL:", axios.defaults.baseURL);
+    const response = await axios.post("/address/add", {
+      address: addressData,
+      userId: user.id,
     });
 
-    const data = await response.json();
-
-    if (data.success) {
+    if (response.data.success) {
       // Refresh addresses after adding
       await fetchAddresses();
-      return data;
+      return response.data;
     } else {
-      throw new Error(data.message || "Failed to add address");
+      throw new Error(response.data.message || "Failed to add address");
     }
   };
 

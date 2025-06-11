@@ -16,7 +16,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + "/api";
+  const API_BASE_URL =
+    (import.meta.env.VITE_BACKEND_URL ||
+      "https://grocery-app-abnm.onrender.com") + "/api";
 
   const handleChange = (e) => {
     const { name, value } = e.target;

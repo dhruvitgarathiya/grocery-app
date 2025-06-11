@@ -20,7 +20,9 @@ const AddressManagement = () => {
     phone: "",
   });
 
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL + "/api";
+  const API_BASE_URL =
+    (import.meta.env.VITE_BACKEND_URL ||
+      "https://grocery-app-abnm.onrender.com") + "/api";
 
   useEffect(() => {
     if (user) {

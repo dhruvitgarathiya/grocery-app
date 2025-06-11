@@ -45,6 +45,12 @@ await connectCloudinary();
 app.use(express.json());
 app.use(cookieParser());
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+  next();
+});
+
 // Simple CORS configuration
 app.use(
   cors({
@@ -73,6 +79,15 @@ app.use("/api/product", porductRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/order", orderRouter);
+
+// Catch-all route for unmatched API routes
+app.use("/api/*", (req, res) => {
+  console.log(`404 - API route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    success: false,
+    message: `API route not found: ${req.method} ${req.originalUrl}`,
+  });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
