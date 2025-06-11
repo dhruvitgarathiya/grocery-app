@@ -15,12 +15,36 @@ const backendURL =
   (import.meta.env.VITE_BACKEND_URL ||
     "https://grocery-app-abnm.onrender.com") + "/api";
 axios.defaults.baseURL = backendURL;
-
-// Configure axios for CORS
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common["Content-Type"] = "application/json";
 
-console.log("Backend URL:", backendURL);
+// Add axios interceptors right after the configuration
+axios.interceptors.request.use(
+  (config) => {
+    console.log("Request:", config.url, config.headers);
+    return config;
+  },
+  (error) => {
+    console.error("Request Error:", error);
+    return Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  (response) => {
+    console.log("Response:", response.status, response.data);
+    return response;
+  },
+  (error) => {
+    console.error("Response Error:", error.response?.data || error.message);
+    if (error.response?.status === 401) {
+      // Handle unauthorized access
+      localStorage.removeItem("user");
+      localStorage.removeItem("seller");
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const AppContext = createContext();
 
@@ -73,12 +97,17 @@ export const AppContextProvider = ({ children }) => {
   const checkUserAuth = useCallback(async () => {
     try {
       console.log("Checking user authentication...");
+      console.log("Current axios baseURL:", axios.defaults.baseURL);
+      console.log("Current axios credentials:", axios.defaults.withCredentials);
 
-      // Test if cookies are being sent
-      const testResponse = await axios.get("/test-auth");
-      console.log("Test auth response:", testResponse.data);
+      const response = await axios.get("/user/is-auth", {
+        withCredentials: true,
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
 
-      const response = await axios.get("/user/is-auth");
       console.log("Auth response:", response.data);
       if (response.data.success) {
         const userData = {
@@ -86,23 +115,27 @@ export const AppContextProvider = ({ children }) => {
           name: response.data.user.name,
           email: response.data.user.email,
         };
-        console.log("Setting user:", userData);
         setUser(userData);
-        // Don't call fetchUserOrders here to avoid circular dependency
-        // Let the MyOrders component handle it when user is available
+        localStorage.setItem("user", JSON.stringify(userData));
       }
     } catch (error) {
-      console.log("User not authenticated:", error.message);
-      // User is not authenticated, which is fine
+      console.error(
+        "Authentication error:",
+        error.response?.data || error.message
+      );
       setUser(null);
+      localStorage.removeItem("user");
     }
   }, []);
 
   // User logout function
   const userLogout = useCallback(async () => {
     try {
-      await axios.get("/user/logout");
+      await axios.get("/user/logout", {
+        withCredentials: true,
+      });
       setUser(null);
+      localStorage.removeItem("user");
       setCartItems({});
       setAddresses([]);
       setSelectedAddress(null);
@@ -111,8 +144,10 @@ export const AppContextProvider = ({ children }) => {
       navigate("/");
       toast.success("Logged out successfully");
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Logout error:", error.response?.data || error.message);
+      // Clean up local state even if the request fails
       setUser(null);
+      localStorage.removeItem("user");
       setCartItems({});
       setAddresses([]);
       setSelectedAddress(null);

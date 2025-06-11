@@ -54,27 +54,28 @@ app.use((req, res, next) => {
 });
 
 // Simple CORS configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://grocery-app-abnm.onrender.com",
+  "https://greencart-frontend.vercel.app",
+  "https://greencart-frontend.netlify.app",
+  "https://greencart.vercel.app",
+  "https://greencart.netlify.app",
+  "https://grocery-app-1-w432.onrender.com",
+];
+
+// CORS middleware
 app.use(
   cors({
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
 
-      const allowedOrigins = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://grocery-app-abnm.onrender.com",
-        "https://greencart-frontend.vercel.app",
-        "https://greencart-frontend.netlify.app",
-        "https://greencart.vercel.app",
-        "https://greencart.netlify.app",
-      ];
-
+      // Allow all subdomains of vercel.app, onrender.com, netlify.app
       if (
-        allowedOrigins.indexOf(origin) !== -1 ||
-        origin.includes("onrender.com") ||
-        origin.includes("vercel.app") ||
-        origin.includes("netlify.app")
+        allowedOrigins.includes(origin) ||
+        /(\.vercel\.app|\.onrender\.com|\.netlify\.app)$/.test(origin)
       ) {
         callback(null, true);
       } else {
