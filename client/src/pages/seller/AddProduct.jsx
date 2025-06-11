@@ -19,6 +19,14 @@ const AddProduct = () => {
       event.preventDefault();
       setLoading(true);
 
+      // Debug: Check seller authentication
+      const sellerToken = localStorage.getItem("sellerToken");
+      console.log(
+        "AddProduct - Seller token:",
+        sellerToken ? sellerToken.substring(0, 20) + "..." : "null"
+      );
+      console.log("AddProduct - Making request to /product/add");
+
       // Validate required fields
       if (!name || !description || !category || !price || !offerPrice) {
         toast.error("Please fill in all required fields");
@@ -52,11 +60,14 @@ const AddProduct = () => {
         }
       }
 
+      console.log("AddProduct - FormData prepared, making request...");
       const { data } = await axios.post("/product/add", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      console.log("AddProduct - Response received:", data);
 
       if (data.success) {
         toast.success("Product added successfully!");
@@ -71,7 +82,8 @@ const AddProduct = () => {
         toast.error(data.message || "Failed to add product");
       }
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("AddProduct - Error adding product:", error);
+      console.error("AddProduct - Error response:", error.response?.data);
       toast.error(
         error.response?.data?.message ||
           "Failed to add product. Please try again."
