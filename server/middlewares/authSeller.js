@@ -11,6 +11,12 @@ const authSeller = async (req, res, next) => {
         ? authHeader.substring(7)
         : null;
 
+    console.log("Auth seller middleware - Authorization header:", authHeader);
+    console.log(
+      "Auth seller middleware - Extracted token:",
+      sellerToken ? sellerToken.substring(0, 20) + "..." : "null"
+    );
+
     if (!sellerToken) {
       console.log(
         "Auth seller middleware - No token provided in Authorization header"
@@ -23,6 +29,15 @@ const authSeller = async (req, res, next) => {
 
     const tokenDecode = jwt.verify(sellerToken, process.env.JWT_SECRET);
     console.log("Auth seller middleware - Token decoded:", tokenDecode);
+    console.log(
+      "Auth seller middleware - Expected email:",
+      process.env.SELLER_EMAIL
+    );
+    console.log("Auth seller middleware - Token email:", tokenDecode.email);
+    console.log(
+      "Auth seller middleware - Email match:",
+      tokenDecode.email === process.env.SELLER_EMAIL
+    );
 
     if (tokenDecode.email === process.env.SELLER_EMAIL) {
       req.sellerId = tokenDecode.id;
@@ -32,7 +47,9 @@ const authSeller = async (req, res, next) => {
       );
       next();
     } else {
-      console.log("Auth seller middleware - Invalid seller token");
+      console.log(
+        "Auth seller middleware - Invalid seller token - email mismatch"
+      );
       return res.status(401).json({
         success: false,
         message: "Not authorized - Invalid seller token",
@@ -40,6 +57,7 @@ const authSeller = async (req, res, next) => {
     }
   } catch (error) {
     console.log("Auth seller middleware - Error:", error.message);
+    console.log("Auth seller middleware - Error stack:", error.stack);
     return res.status(401).json({
       success: false,
       message: "Not authorized - Invalid token",

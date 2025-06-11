@@ -21,8 +21,23 @@ axios.defaults.headers.common["Content-Type"] = "application/json";
 axios.interceptors.request.use(
   (config) => {
     // Add Authorization header with token from localStorage
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("sellerToken");
+    const userToken = localStorage.getItem("token");
+    const sellerToken = localStorage.getItem("sellerToken");
+    const token = userToken || sellerToken;
+
+    console.log(
+      "Axios interceptor - User token:",
+      userToken ? userToken.substring(0, 20) + "..." : "null"
+    );
+    console.log(
+      "Axios interceptor - Seller token:",
+      sellerToken ? sellerToken.substring(0, 20) + "..." : "null"
+    );
+    console.log(
+      "Axios interceptor - Using token:",
+      token ? token.substring(0, 20) + "..." : "null"
+    );
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -45,8 +60,9 @@ axios.interceptors.response.use(
     console.error("Response Error:", error.response?.data || error.message);
     if (error.response?.status === 401) {
       // Handle unauthorized access
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
-      localStorage.removeItem("seller");
+      localStorage.removeItem("sellerToken");
     }
     return Promise.reject(error);
   }
@@ -89,22 +105,36 @@ export const AppContextProvider = ({ children }) => {
     try {
       // Get seller token from localStorage
       const sellerToken = localStorage.getItem("sellerToken");
+      console.log(
+        "checkSellerAuth - Seller token from localStorage:",
+        sellerToken ? sellerToken.substring(0, 20) + "..." : "null"
+      );
 
       if (sellerToken) {
         // Verify token by making a request to is-auth endpoint
+        console.log("checkSellerAuth - Making request to /seller/is-auth");
         const response = await axios.get("/seller/is-auth");
+        console.log("checkSellerAuth - Response:", response.data);
+
         if (response.data.success) {
           setIsSeller(true);
+          console.log("checkSellerAuth - Seller authenticated successfully");
           // Don't call fetchSellerOrders here to avoid circular dependency
         } else {
           // Token is invalid, clear localStorage
+          console.log("checkSellerAuth - Token invalid, clearing localStorage");
           localStorage.removeItem("sellerToken");
           setIsSeller(false);
         }
       } else {
+        console.log("checkSellerAuth - No seller token found");
         setIsSeller(false);
       }
     } catch (error) {
+      console.error(
+        "checkSellerAuth - Error:",
+        error.response?.data || error.message
+      );
       // Seller is not authenticated, clear invalid token
       localStorage.removeItem("sellerToken");
       setIsSeller(false);
