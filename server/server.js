@@ -81,12 +81,20 @@ app.use("/api/address", addressRouter);
 app.use("/api/order", orderRouter);
 
 // Catch-all route for unmatched API routes
-app.use("/api/*", (req, res) => {
-  console.log(`404 - API route not found: ${req.method} ${req.originalUrl}`);
-  res.status(404).json({
-    success: false,
-    message: `API route not found: ${req.method} ${req.originalUrl}`,
-  });
+app.use("*", (req, res) => {
+  if (req.path.startsWith("/api/")) {
+    console.log(`404 - API route not found: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({
+      success: false,
+      message: `API route not found: ${req.method} ${req.originalUrl}`,
+    });
+  } else {
+    // For non-API routes, just pass through
+    res.status(404).json({
+      success: false,
+      message: "Route not found",
+    });
+  }
 });
 
 // Error handling middleware
