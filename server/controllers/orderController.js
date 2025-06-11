@@ -84,16 +84,31 @@ export const testAuth = async (req, res) => {
 
 export const getAllorders = async (req, res) => {
   try {
+    console.log("=== GET ALL ORDERS (SELLER) ===");
+    console.log("Seller email from auth:", req.sellerEmail);
+
+    // Verify seller authentication
+    if (!req.sellerEmail) {
+      console.log("No seller email found in request");
+      return res.status(401).json({
+        success: false,
+        message: "Seller not authenticated",
+      });
+    }
+
+    console.log("Fetching all orders for seller...");
     const orders = await Order.find({
       $or: [{ paymentType: "COD" }, { isPaid: true }],
     }).populate("items.product address");
 
+    console.log("Orders found:", orders.length);
     res.json({
       success: true,
       orders,
     });
   } catch (error) {
-    res.json({
+    console.error("Error fetching all orders:", error);
+    res.status(500).json({
       success: false,
       message: error.message,
     });
@@ -138,6 +153,18 @@ export const getUserOrders = async (req, res) => {
 // Update order status (for sellers)
 export const updateOrderStatus = async (req, res) => {
   try {
+    console.log("=== UPDATE ORDER STATUS ===");
+    console.log("Seller email from auth:", req.sellerEmail);
+
+    // Verify seller authentication
+    if (!req.sellerEmail) {
+      console.log("No seller email found in request");
+      return res.status(401).json({
+        success: false,
+        message: "Seller not authenticated",
+      });
+    }
+
     const { orderId, status } = req.body;
 
     if (!orderId || !status) {
@@ -179,6 +206,7 @@ export const updateOrderStatus = async (req, res) => {
       "items.product address"
     );
 
+    console.log("Order status updated successfully:", orderId, "to", status);
     return res.json({
       success: true,
       message: "Order status updated successfully",
@@ -263,6 +291,18 @@ export const cancelOrder = async (req, res) => {
 // Get order statistics (for sellers)
 export const getOrderStats = async (req, res) => {
   try {
+    console.log("=== GET ORDER STATS ===");
+    console.log("Seller email from auth:", req.sellerEmail);
+
+    // Verify seller authentication
+    if (!req.sellerEmail) {
+      console.log("No seller email found in request");
+      return res.status(401).json({
+        success: false,
+        message: "Seller not authenticated",
+      });
+    }
+
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({
       status: "order placed",
@@ -281,6 +321,7 @@ export const getOrderStats = async (req, res) => {
       cancelled: cancelledOrders,
     };
 
+    console.log("Order stats calculated:", stats);
     return res.json({
       success: true,
       stats,

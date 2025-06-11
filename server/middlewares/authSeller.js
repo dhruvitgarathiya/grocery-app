@@ -40,10 +40,10 @@ const authSeller = async (req, res, next) => {
     );
 
     if (tokenDecode.email === process.env.SELLER_EMAIL) {
-      req.sellerId = tokenDecode.id;
+      req.sellerEmail = tokenDecode.email;
       console.log(
         "Auth seller middleware - Seller authenticated:",
-        req.sellerId
+        req.sellerEmail
       );
       next();
     } else {
