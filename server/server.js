@@ -190,6 +190,34 @@ app.get("/api/debug-cookies", (req, res) => {
   });
 });
 
+// Test POST endpoint for debugging
+app.post("/api/test-post", (req, res) => {
+  console.log("Test POST endpoint hit");
+  console.log("Request headers:", req.headers);
+  console.log("Request body:", req.body);
+  res.json({
+    success: true,
+    message: "Test POST endpoint working",
+    headers: req.headers,
+    body: req.body,
+  });
+});
+
+// Test multipart POST endpoint for debugging
+app.post("/api/test-multipart", upload.array("images"), (req, res) => {
+  console.log("Test multipart POST endpoint hit");
+  console.log("Request headers:", req.headers);
+  console.log("Request files:", req.files);
+  console.log("Request body:", req.body);
+  res.json({
+    success: true,
+    message: "Test multipart POST endpoint working",
+    headers: req.headers,
+    files: req.files ? req.files.length : 0,
+    body: req.body,
+  });
+});
+
 app.use("/api/user", userRouter);
 app.use("/api/seller", sellerRouter);
 app.use("/api/product", porductRouter);

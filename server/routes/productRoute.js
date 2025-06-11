@@ -11,6 +11,13 @@ import {
 
 const porductRouter = express.Router();
 
+// Debug middleware for product routes
+porductRouter.use((req, res, next) => {
+  console.log(`Product route hit: ${req.method} ${req.path}`);
+  console.log("Product route headers:", req.headers);
+  next();
+});
+
 porductRouter.post("/add", upload.array("images"), authSeller, addProduct);
 porductRouter.get("/list", productList);
 porductRouter.get("/id", productById);
