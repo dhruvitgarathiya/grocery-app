@@ -50,12 +50,14 @@ export const register = async (req, res) => {
       // csrf protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
       path: "/", // ensure cookie is available for all paths
+      // domain: req.headers.host, // try setting domain explicitly
     };
 
     console.log("Setting cookie with options:", cookieOptions);
     console.log("NODE_ENV:", process.env.NODE_ENV);
     console.log("Request origin:", req.headers.origin);
     console.log("Request host:", req.headers.host);
+    console.log("Request referer:", req.headers.referer);
     console.log("Is production:", process.env.NODE_ENV === "production");
     console.log("Cookie secure:", cookieOptions.secure);
     console.log("Cookie sameSite:", cookieOptions.sameSite);
@@ -85,9 +87,14 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    console.log("Login request received");
+    console.log("Request body:", req.body);
+    console.log("Request headers:", req.headers);
+
     const { email, password } = req.body;
 
     if (!email || !password) {
+      console.log("Missing email or password");
       return res.status(400).json({
         success: false,
         message: "Email and password are required",
@@ -95,8 +102,10 @@ export const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+    console.log("User found:", user ? "Yes" : "No");
 
     if (!user) {
+      console.log("User not found for email:", email);
       return res.status(400).json({
         success: false,
         message: "Invalid email or password",
@@ -104,8 +113,10 @@ export const login = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password match:", isMatch ? "Yes" : "No");
 
     if (!isMatch) {
+      console.log("Password does not match");
       return res.status(400).json({
         success: false,
         message: "Invalid email or password",
@@ -124,6 +135,7 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
+    console.log("Token generated:", token.substring(0, 20) + "...");
 
     const cookieOptions = {
       httpOnly: true, // prevent js to access the cookie
@@ -132,19 +144,22 @@ export const login = async (req, res) => {
       // csrf protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
       path: "/", // ensure cookie is available for all paths
+      // domain: req.headers.host, // try setting domain explicitly
     };
 
     console.log("Setting cookie with options:", cookieOptions);
     console.log("NODE_ENV:", process.env.NODE_ENV);
     console.log("Request origin:", req.headers.origin);
     console.log("Request host:", req.headers.host);
+    console.log("Request referer:", req.headers.referer);
     console.log("Is production:", process.env.NODE_ENV === "production");
     console.log("Cookie secure:", cookieOptions.secure);
     console.log("Cookie sameSite:", cookieOptions.sameSite);
 
     res.cookie("token", token, cookieOptions);
+    console.log("Cookie set successfully");
 
-    return res.status(200).json({
+    const responseData = {
       success: true,
       message: "User logged in successfully",
       user: {
@@ -153,7 +168,10 @@ export const login = async (req, res) => {
         name: user.name,
       },
       token: token,
-    });
+    };
+
+    console.log("Sending response:", responseData);
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({

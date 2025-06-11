@@ -45,6 +45,28 @@ const AddressManagement = () => {
     }
   };
 
+  const testCookie = async () => {
+    try {
+      console.log("Testing cookie setting...");
+      const response = await fetch(`${API_BASE_URL}/test-cookie`, {
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log("Test cookie response:", data);
+      console.log("Current cookies:", document.cookie);
+      alert(
+        `Cookie test: ${JSON.stringify(
+          data,
+          null,
+          2
+        )}\n\nCheck browser cookies for testCookie`
+      );
+    } catch (error) {
+      console.error("Cookie test error:", error);
+      alert(`Cookie test error: ${error.message}`);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prev) => ({ ...prev, [name]: value }));
@@ -123,6 +145,12 @@ const AddressManagement = () => {
             className="text-blue-400 hover:text-blue-300 transition text-sm"
           >
             Test Auth
+          </button>
+          <button
+            onClick={testCookie}
+            className="text-blue-400 hover:text-blue-300 transition text-sm"
+          >
+            Test Cookie
           </button>
           <Link
             to="/cart"

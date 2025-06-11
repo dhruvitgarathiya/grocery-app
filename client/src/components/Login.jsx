@@ -117,6 +117,7 @@ const Login = () => {
         }
 
         // Login API call
+        console.log("Making login request to:", `${API_BASE_URL}/user/login`);
         const response = await fetch(`${API_BASE_URL}/user/login`, {
           method: "POST",
           headers: {
@@ -129,10 +130,17 @@ const Login = () => {
           }),
         });
 
+        console.log("Login response status:", response.status);
+        console.log("Login response headers:", response.headers);
+        console.log("Login response ok:", response.ok);
+
         const data = await response.json();
-        console.log("Login response:", data);
-        console.log("Response headers:", response.headers);
+        console.log("Login response data:", data);
         console.log("Response cookies:", document.cookie);
+        console.log(
+          "All cookies:",
+          document.cookie.split(";").map((c) => c.trim())
+        );
 
         if (data.success) {
           const userData = {

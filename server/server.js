@@ -84,6 +84,23 @@ app.get("/api/test-auth", (req, res) => {
   });
 });
 
+// Test cookie setting endpoint
+app.get("/api/test-cookie", (req, res) => {
+  console.log("Setting test cookie");
+  res.cookie("testCookie", "testValue", {
+    httpOnly: false, // make it accessible to JavaScript for testing
+    secure: false,
+    sameSite: "lax",
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+    path: "/",
+  });
+  res.json({
+    message: "Test cookie set",
+    cookies: req.cookies,
+    instruction: "Check browser cookies to see if testCookie is set",
+  });
+});
+
 app.use("/api/user", userRouter);
 app.use("/api/seller", sellerRouter);
 app.use("/api/product", porductRouter);
