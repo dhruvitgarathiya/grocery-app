@@ -45,26 +45,22 @@ await connectCloudinary();
 app.use(express.json());
 app.use(cookieParser());
 
-// Allow all origins - No CORS restrictions
-
-app.use(cors());
-
-// Handle preflight requests for all routes
-
-// Add permissive headers for all requests
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,PUT,POST,DELETE,OPTIONS,PATCH"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin,X-Requested-With,Content-Type,Accept,Authorization"
-  );
-  next();
-});
+// Simple CORS configuration
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+    ],
+    exposedHeaders: ["Set-Cookie"],
+  })
+);
 
 // Basic route
 app.get("/", (req, res) => {
