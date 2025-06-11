@@ -22,6 +22,7 @@ import porductRouter from "./routes/productRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import addressRouter from "./routes/addressRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import { upload } from "./configs/multer.js";
 
 // Debug: Check if environment variables are loaded
 console.log("Environment variables loaded:");
