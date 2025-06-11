@@ -95,8 +95,7 @@ export const AppContextProvider = ({ children }) => {
         const response = await axios.get("/seller/is-auth");
         if (response.data.success) {
           setIsSeller(true);
-          // Fetch seller orders if authenticated
-          fetchSellerOrders();
+          // Don't call fetchSellerOrders here to avoid circular dependency
         } else {
           // Token is invalid, clear localStorage
           localStorage.removeItem("sellerToken");
@@ -110,7 +109,7 @@ export const AppContextProvider = ({ children }) => {
       localStorage.removeItem("sellerToken");
       setIsSeller(false);
     }
-  }, [fetchSellerOrders]);
+  }, []);
 
   // Check user authentication on mount
   const checkUserAuth = useCallback(async () => {
@@ -735,6 +734,13 @@ export const AppContextProvider = ({ children }) => {
       fetchAddresses();
     }
   }, [user]);
+
+  // Fetch seller orders when seller is authenticated
+  useEffect(() => {
+    if (isSeller) {
+      fetchSellerOrders();
+    }
+  }, [isSeller, fetchSellerOrders]);
 
   const contextValue = {
     user,
