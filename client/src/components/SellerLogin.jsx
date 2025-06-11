@@ -54,6 +54,16 @@ const SellerLogin = () => {
       if (data.success) {
         // Store seller token in localStorage
         localStorage.setItem("sellerToken", data.token);
+        console.log(
+          "SellerLogin - Token stored:",
+          data.token.substring(0, 20) + "..."
+        );
+        console.log(
+          "SellerLogin - Token from localStorage:",
+          localStorage.getItem("sellerToken")
+            ? localStorage.getItem("sellerToken").substring(0, 20) + "..."
+            : "null"
+        );
 
         setIsSeller(true);
         setShowSellerLogin(false);

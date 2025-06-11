@@ -6,6 +6,20 @@ export const sellerLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log("Seller login attempt - Email:", email);
+    console.log(
+      "Seller login attempt - Expected email:",
+      process.env.SELLER_EMAIL
+    );
+    console.log(
+      "Seller login attempt - Password match:",
+      password === process.env.SELLER_PASSWORD
+    );
+    console.log(
+      "Seller login attempt - Email match:",
+      email === process.env.SELLER_EMAIL
+    );
+
     if (
       password === process.env.SELLER_PASSWORD &&
       email === process.env.SELLER_EMAIL
@@ -35,6 +49,7 @@ export const sellerLogin = async (req, res) => {
         token: token,
       });
     } else {
+      console.log("Seller login failed - Invalid credentials");
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
