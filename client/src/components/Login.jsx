@@ -130,13 +130,18 @@ const Login = () => {
         });
 
         const data = await response.json();
+        console.log("Login response:", data);
+        console.log("Response headers:", response.headers);
+        console.log("Response cookies:", document.cookie);
 
         if (data.success) {
-          setUser({
+          const userData = {
             id: data.user.id,
             name: data.user.name,
             email: data.user.email,
-          });
+          };
+          console.log("Setting user after login:", userData);
+          setUser(userData);
           setShowUserLogin(false);
           toast.success(`Welcome back, ${data.user.name}!`);
         } else {

@@ -30,6 +30,21 @@ const AddressManagement = () => {
     }
   }, [user, fetchAddresses]);
 
+  const testAuth = async () => {
+    try {
+      console.log("Testing authentication...");
+      const response = await fetch(`${API_BASE_URL}/test-auth`, {
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log("Test auth response:", data);
+      alert(`Auth test: ${JSON.stringify(data, null, 2)}`);
+    } catch (error) {
+      console.error("Auth test error:", error);
+      alert(`Auth test error: ${error.message}`);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAddress((prev) => ({ ...prev, [name]: value }));
@@ -102,12 +117,20 @@ const AddressManagement = () => {
     <div className="mt-10 max-w-4xl mx-auto px-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl md:text-3xl font-medium">Address Management</h1>
-        <Link
-          to="/cart"
-          className="text-[#00FF41] hover:text-[#00CC33] transition"
-        >
-          ← Back to Cart
-        </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={testAuth}
+            className="text-blue-400 hover:text-blue-300 transition text-sm"
+          >
+            Test Auth
+          </button>
+          <Link
+            to="/cart"
+            className="text-[#00FF41] hover:text-[#00CC33] transition"
+          >
+            ← Back to Cart
+          </Link>
+        </div>
       </div>
 
       {/* Address List */}

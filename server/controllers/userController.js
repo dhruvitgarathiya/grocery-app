@@ -45,14 +45,20 @@ export const register = async (req, res) => {
 
     const cookieOptions = {
       httpOnly: true, // prevent js to access the cookie
-      secure: process.env.NODE_ENV === "production", // use secure cookie in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      secure: false, // temporarily disable secure to test
+      sameSite: "lax", // use lax for better compatibility
       // csrf protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
+      path: "/", // ensure cookie is available for all paths
     };
 
     console.log("Setting cookie with options:", cookieOptions);
     console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("Request origin:", req.headers.origin);
+    console.log("Request host:", req.headers.host);
+    console.log("Is production:", process.env.NODE_ENV === "production");
+    console.log("Cookie secure:", cookieOptions.secure);
+    console.log("Cookie sameSite:", cookieOptions.sameSite);
 
     res.cookie("token", token, cookieOptions);
 
@@ -121,14 +127,20 @@ export const login = async (req, res) => {
 
     const cookieOptions = {
       httpOnly: true, // prevent js to access the cookie
-      secure: process.env.NODE_ENV === "production", // use secure cookie in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      secure: false, // temporarily disable secure to test
+      sameSite: "lax", // use lax for better compatibility
       // csrf protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
+      path: "/", // ensure cookie is available for all paths
     };
 
     console.log("Setting cookie with options:", cookieOptions);
     console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("Request origin:", req.headers.origin);
+    console.log("Request host:", req.headers.host);
+    console.log("Is production:", process.env.NODE_ENV === "production");
+    console.log("Cookie secure:", cookieOptions.secure);
+    console.log("Cookie sameSite:", cookieOptions.sameSite);
 
     res.cookie("token", token, cookieOptions);
 
@@ -192,8 +204,9 @@ export const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      secure: false,
+      sameSite: "lax",
+      path: "/",
     });
 
     return res.json({
