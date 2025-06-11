@@ -588,9 +588,7 @@ export const AppContextProvider = ({ children }) => {
     try {
       console.log("Fetching addresses for user:", user.id);
       console.log("API Base URL:", axios.defaults.baseURL);
-      const response = await axios.post("/address/get", {
-        userId: user.id,
-      });
+      const response = await axios.post("/address/get");
 
       if (response.data.success) {
         setAddresses(response.data.addresses || []);
@@ -621,7 +619,6 @@ export const AppContextProvider = ({ children }) => {
 
     const response = await axios.post("/address/add", {
       address: addressData,
-      userId: user.id,
     });
 
     if (response.data.success) {
@@ -635,11 +632,29 @@ export const AppContextProvider = ({ children }) => {
 
   // Remove address from backend
   const removeAddress = async (addressId) => {
-    // For now, we'll just remove from local state
-    // You can implement backend deletion later
-    setAddresses((prev) => prev.filter((addr) => addr._id !== addressId));
-    if (selectedAddress?._id === addressId) {
-      setSelectedAddress(null);
+    if (!user) {
+      throw new Error("User not logged in");
+    }
+
+    try {
+      console.log("Removing address:", addressId);
+      const response = await axios.delete("/address/delete", {
+        data: { addressId },
+      });
+
+      if (response.data.success) {
+        // Remove from local state
+        setAddresses((prev) => prev.filter((addr) => addr._id !== addressId));
+        if (selectedAddress?._id === addressId) {
+          setSelectedAddress(null);
+        }
+        return response.data;
+      } else {
+        throw new Error(response.data.message || "Failed to remove address");
+      }
+    } catch (error) {
+      console.error("Error removing address:", error);
+      throw error;
     }
   };
 

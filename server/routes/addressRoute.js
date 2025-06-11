@@ -1,5 +1,9 @@
 import express from "express";
-import { addAddress, getAddress } from "../controllers/addressController.js";
+import {
+  addAddress,
+  getAddress,
+  deleteAddress,
+} from "../controllers/addressController.js";
 import authUser from "../middlewares/authUser.js";
 
 const addressRouter = express.Router();
@@ -12,5 +16,6 @@ addressRouter.use((req, res, next) => {
 
 addressRouter.post("/add", authUser, addAddress);
 addressRouter.post("/get", authUser, getAddress);
+addressRouter.delete("/delete", authUser, deleteAddress);
 
 export default addressRouter;
