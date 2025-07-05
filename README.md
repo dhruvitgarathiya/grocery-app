@@ -1,5 +1,9 @@
 # GreenCart - E-Commerce Platform
 
+## 🌐 Live Demo
+
+**Project Link**: https://grocery-app-1-w432.onrender.com/
+
 A full-stack e-commerce application built with React, Node.js, and MongoDB. GreenCart provides a complete online grocery shopping experience with user and seller authentication, product management, order processing, and address management.
 
 ## 🌟 Features
@@ -157,9 +161,7 @@ greencart/
 
 - `POST /api/user/register` - User registration
 - `POST /api/user/login` - User login
-- `GET /api/user/is-auth` - Check user authentication
 - `POST /api/seller/login` - Seller login
-- `GET /api/seller/is-auth` - Check seller authentication
 
 ### Products
 
@@ -172,15 +174,19 @@ greencart/
 - `POST /api/order/cod` - Place COD order
 - `GET /api/order/user` - Get user orders
 - `GET /api/order/seller` - Get all orders (seller only)
-- `PUT /api/order/status` - Update order status (seller only)
-- `PUT /api/order/cancel` - Cancel order
-- `GET /api/order/stats` - Get order statistics (seller only)
+- `POST /api/order/status` - Update order status (seller only)
+
+### Cart
+
+- `POST /api/cart/add` - Add item to cart
+- `POST /api/cart/remove` - Remove item from cart
+- `POST /api/cart/get` - Get user cart
 
 ### Addresses
 
 - `POST /api/address/add` - Add new address
 - `POST /api/address/get` - Get user addresses
-- `DELETE /api/address/delete` - Delete address
+- `POST /api/address/delete` - Delete address
 
 ## 🔐 Authentication
 
@@ -188,33 +194,23 @@ greencart/
 
 - JWT token-based authentication
 - Tokens stored in localStorage
-- Automatic token refresh and validation
-- Secure password hashing with bcrypt
+- Automatic token refresh
+- Protected routes with middleware
 
 ### Seller Authentication
 
 - Environment-based credentials
 - Secure seller login with JWT tokens
-- Protected seller-only endpoints
-- Role-based access control
-
-## 🛒 Shopping Flow
-
-1. **Browse Products**: Users can browse products with search and filtering
-2. **Add to Cart**: Add products to shopping cart with quantity selection
-3. **Manage Addresses**: Add and select delivery addresses
-4. **Place Order**: Complete checkout with COD payment
-5. **Track Orders**: Monitor order status and history
-6. **Seller Management**: Sellers can manage products and orders
+- Protected seller routes
+- Session management
 
 ## 📱 Responsive Design
 
-The application is fully responsive and works seamlessly on:
+The application is fully responsive and works on:
 
+- Mobile phones
 - Desktop computers
 - Tablets
-- Mobile phones
-- Various screen sizes and orientations
 
 ## 🚀 Deployment
 
@@ -229,11 +225,10 @@ The application is fully responsive and works seamlessly on:
 
 - Build the application: `npm run build`
 - Deploy to platforms like Vercel, Netlify, or GitHub Pages
-- Configure environment variables for production
+- Configure environment variables
+- Set up custom domain (optional)
 
-## 🔧 Configuration
-
-### Environment Variables
+## 🔧 Environment Variables
 
 **Backend (.env)**
 
@@ -242,7 +237,9 @@ The application is fully responsive and works seamlessly on:
 - `JWT_SECRET`: Secret key for JWT tokens
 - `SELLER_EMAIL`: Seller login email
 - `SELLER_PASSWORD`: Seller login password
-- `CLOUDINARY_*`: Cloudinary configuration
+- `CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name
+- `CLOUDINARY_API_KEY`: Cloudinary API key
+- `CLOUDINARY_API_SECRET`: Cloudinary API secret
 
 **Frontend (.env)**
 
@@ -250,12 +247,9 @@ The application is fully responsive and works seamlessly on:
 
 ## 📖 Additional Documentation
 
-- [Address Management](ADDRESS_MANAGEMENT_README.md)
-- [Seller Setup](SELLER_SETUP.md)
-- [Payment Setup](PAYMENT_SETUP.md)
-- [Order Management](ORDER_MANAGEMENT.md)
-- [Login Setup](LOGIN_SETUP.md)
-- [Deployment Guide](DEPLOYMENT.md)
+- Check the documentation files
+- Review the API endpoints
+- Test the application features
 
 ## 🤝 Contributing
 
@@ -267,28 +261,11 @@ The application is fully responsive and works seamlessly on:
 
 ## 📄 License
 
-This project is licensed under the ISC License.
+This project is licensed under the MIT License.
 
-## 🆘 Support
+## 👨‍💻 Author
 
-For support and questions:
+**Dhruvit Garathiya**
 
-- Check the documentation files
-- Review the API endpoints
-- Check the console for error messages
-- Ensure all environment variables are set correctly
-
-## 🎯 Future Enhancements
-
-- Payment gateway integration (Stripe, PayPal)
-- Email notifications
-- Order tracking with real-time updates
-- Product reviews and ratings
-- Advanced search and filtering
-- Inventory management system
-- Analytics dashboard
-- Mobile app development
-
----
-
-**GreenCart** - Your complete e-commerce solution for grocery shopping! 🛒✨
+- GitHub: [@dhruvitgarathiya](https://github.com/dhruvitgarathiya)
+- Project: [GreenCart](https://github.com/dhruvitgarathiya/grocery-app)
